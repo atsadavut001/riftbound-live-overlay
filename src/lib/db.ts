@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "pg";
 import { DataSource } from "typeorm";
 import { User } from "./entities/User";
 import { OverlayState } from "./entities/OverlayState";
