@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: String(error), stack: (error as any).stack }, { status: 500 });
   }
 }
 
@@ -108,6 +108,6 @@ export async function POST(req: NextRequest) {
     if (error.code === '23505') { // unique violation
       return NextResponse.json({ error: "Card code already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: String(error), stack: error.stack }, { status: 500 });
   }
 }
