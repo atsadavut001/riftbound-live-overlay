@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@Entity()
+@Entity("card_type_template")
 export class CardTypeTemplate {
   @PrimaryGeneratedColumn("uuid")
   id!: string;

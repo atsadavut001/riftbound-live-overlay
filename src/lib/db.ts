@@ -10,7 +10,7 @@ import { Issue } from "./entities/Issue";
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
-  synchronize: true, // ควรปิดเมื่อขึ้น Production
+  synchronize: false, // ⚠️ MUST BE FALSE IN PRODUCTION DUE TO MINIFICATION
   logging: false,
   entities: [User, OverlayState, Card, CardTypeTemplate, Issue],
   subscribers: [],
