@@ -300,8 +300,8 @@ export default function DashboardPage() {
                 }}
                 className="w-full sm:w-1/3 bg-[#111] border border-[var(--border)] rounded-md px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
               >
-                <option value="none">Without Camera (ไม่มีกล้อง)</option>
-                <option value="cam">With Camera (มีกล้อง)</option>
+                <option value="none">Without Camera</option>
+                <option value="cam">With Camera</option>
               </select>
             </div>
           </div>
@@ -876,7 +876,7 @@ export default function DashboardPage() {
               </div>
               
               <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-[#333]">
-                <label className="text-sm text-gray-300">เวลาการแสดงการ์ด (วินาที)</label>
+                <label className="text-sm text-gray-300">Card display time (seconds)</label>
                 <input 
                   type="number" 
                   value={state?.cards?.displaySeconds ?? 10}
@@ -917,7 +917,7 @@ export default function DashboardPage() {
                 onClick={() => setCardSetupTab('manual')}
                 className={`pb-2 text-sm font-medium transition-colors ${cardSetupTab === 'manual' ? 'text-[var(--primary)] border-b-2 border-[var(--primary)]' : 'text-gray-400 hover:text-gray-300'}`}
               >
-                ค้นหาเอง (Manual)
+                Manual Search
               </button>
               <button 
                 onClick={() => setCardSetupTab('import')}
@@ -1000,7 +1000,7 @@ export default function DashboardPage() {
                         onClick={() => setP1Deck([])}
                         className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 text-xs px-3 py-1 rounded transition-colors"
                       >
-                        ล้างค่า
+                        Clear
                       </button>
                     </div>
                   </div>
@@ -1058,7 +1058,7 @@ export default function DashboardPage() {
                         onClick={() => setP2Deck([])}
                         className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-900/50 text-xs px-3 py-1 rounded transition-colors"
                       >
-                        ล้างค่า
+                        Clear
                       </button>
                     </div>
                   </div>
