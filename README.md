@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <h1>🎮 Riftbound Live Overlay</h1>
+  <p><strong>Professional, web-based live streaming overlay for Riftbound broadcasts.</strong></p>
+  <a href="https://riftbound-live-overlay.vercel.app/"><strong>🔗 Live Demo & App URL</strong></a>
+</div>
 
-## Getting Started
+<br />
 
-First, run the development server:
+## 🌟 About This Project
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Riftbound Live Overlay** is a dynamic, web-based streaming overlay system designed to elevate live broadcasts. Built specifically for seamless integration into broadcasting software like **OBS Studio** and **XSplit**, it delivers real-time visual elements and crucial game information directly to your viewers.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+By focusing on a clean, professional, and informative design, this overlay ensures that your audience never misses a beat during intense live matches.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **📊 Live Data Display:** Showcases dynamic game state information, real-time card details, and player statistics instantly.
+- **🌐 Web-Based Integration:** Works flawlessly as a "Browser Source" in your streaming software. No heavy installations or downloads required!
+- **⚡ Real-Time Updates:** Instantly reacts and updates overlay components to guarantee the most accurate information on stream.
+- **🎛️ Comprehensive Management:** Features a built-in admin dashboard to effortlessly manage cards, view stats, and configure the overlay on the fly.
 
-## Learn More
+## 🚀 How to Use (in OBS Studio)
 
-To learn more about Next.js, take a look at the following resources:
+1. Open **OBS Studio** (or your preferred streaming software).
+2. Under the **Sources** panel, click the `+` button and select **Browser**.
+3. Name the source (e.g., "Riftbound Overlay").
+4. In the URL field, paste the overlay link generated from the app:
+   **[https://riftbound-live-overlay.vercel.app/](https://riftbound-live-overlay.vercel.app/)**
+5. Set the **Width** and **Height** to match your stream canvas (typically `1920` x `1080`).
+6. Click **OK** and enjoy your professional broadcast graphics!
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend:** Next.js (React), Tailwind CSS
+- **Backend:** Next.js API Routes, NextAuth.js
+- **Database:** PostgreSQL (via TypeORM)
+- **Deployment:** Vercel
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<div align="center">
+  <sub>Designed to enhance the Riftbound streaming and viewing experience. 🚀</sub>
+</div>

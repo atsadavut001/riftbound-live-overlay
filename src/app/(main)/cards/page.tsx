@@ -446,16 +446,16 @@ export default function CardLibraryPage() {
 
               {/* Stats Box */}
               {(selectedCard.detail?.Energy || selectedCard.detail?.Power || selectedCard.detail?.Might) && (
-                <div className="grid grid-cols-3 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 mb-8">
-                  <div className="flex flex-col items-center justify-center">
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
                     <span className="text-gray-400 text-sm mb-1">Energy</span>
                     <span className="text-4xl font-bold">{selectedCard.detail?.Energy || '-'}</span>
                   </div>
-                  <div className="flex flex-col items-center justify-center border-x border-[#333]">
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
                     <span className="text-gray-400 text-sm mb-1">Power</span>
                     <span className="text-4xl font-bold">{selectedCard.detail?.Power || '-'}</span>
                   </div>
-                  <div className="flex flex-col items-center justify-center">
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
                     <span className="text-gray-400 text-sm mb-1">Might</span>
                     <span className="text-4xl font-bold">{selectedCard.detail?.Might || '-'}</span>
                   </div>
@@ -472,7 +472,8 @@ export default function CardLibraryPage() {
                 </div>
               )}
 
-              {selectedCard.detail?.["Flavor Text"] && (
+              {/* Flavor Text (Original) - Show only if we don't move it to Equip Section */}
+              {selectedCard.detail?.["Flavor Text"] && (selectedCard.detail?.["Equip Effect"] || selectedCard.detail?.["Equip Might"] === undefined) && (
                 <div className="mb-8">
                   <h3 className="text-lg font-bold mb-2">Flavor Text</h3>
                   <p className="text-gray-500 italic leading-relaxed whitespace-pre-wrap">
@@ -481,21 +482,35 @@ export default function CardLibraryPage() {
                 </div>
               )}
 
-              {/* Equip Effect */}
-              {selectedCard.detail?.["Equip Effect"] && (
-                <div className="mb-8">
-                  <div className="flex flex-col sm:flex-row bg-[#1a1a1a] border border-[#333] rounded-xl overflow-hidden">
-                    <div className="w-full sm:w-4/5 p-4 sm:p-6 border-b sm:border-b-0 sm:border-r border-[#333]">
+              {/* Equip Section */}
+              {(selectedCard.detail?.["Equip Effect"] || selectedCard.detail?.["Equip Might"] !== undefined) && (
+                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                  {/* Left Box: Equip Effect OR Flavor Text OR Empty space */}
+                  {selectedCard.detail?.["Equip Effect"] ? (
+                    <div className="flex-1 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6">
                       <h3 className="text-lg font-bold mb-2">Equip Effect</h3>
                       <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                         {renderAbilityText(selectedCard.detail?.["Equip Effect"])}
                       </div>
                     </div>
-                    <div className="w-full sm:w-1/5 flex flex-col items-center justify-center p-4 bg-[#111]">
-                      <span className="text-gray-400 text-sm mb-1 text-center">Might</span>
-                      <span className="text-4xl font-bold">{selectedCard.detail?.["Equip Might"] || '-'}</span>
+                  ) : selectedCard.detail?.["Flavor Text"] ? (
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h3 className="text-lg font-bold mb-2">Flavor Text</h3>
+                      <p className="text-gray-500 italic leading-relaxed whitespace-pre-wrap">
+                        {selectedCard.detail?.["Flavor Text"]}
+                      </p>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex-1" />
+                  )}
+
+                  {/* Right Box: Equip Might */}
+                  {selectedCard.detail?.["Equip Might"] !== undefined && (
+                    <div className="w-full sm:w-32 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center shrink-0">
+                      <span className="text-gray-400 text-sm mb-1 text-center">Equip Might</span>
+                      <span className="text-4xl font-bold">{selectedCard.detail?.["Equip Might"]}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

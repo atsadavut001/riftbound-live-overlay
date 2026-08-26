@@ -69,19 +69,64 @@ export default function AdminCardPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
+  // Load state from sessionStorage on mount
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
+    try {
+      const saved = sessionStorage.getItem('adminCardFilters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.page) setPage(parsed.page);
+        if (parsed.limit) setLimit(parsed.limit);
+        if (parsed.selectedSet) setSelectedSet(parsed.selectedSet);
+        if (parsed.selectedType) setSelectedType(parsed.selectedType);
+        if (parsed.selectedRarity) setSelectedRarity(parsed.selectedRarity);
+        if (parsed.selectedColor) setSelectedColor(parsed.selectedColor);
+        if (parsed.searchTerm !== undefined) {
+          setSearchTerm(parsed.searchTerm);
+          setDebouncedSearchTerm(parsed.searchTerm);
+        }
+      }
+    } catch (e) {}
+    setIsInitialized(true);
+  }, []);
+
+  // Save state to sessionStorage when filters change
+  useEffect(() => {
+    if (!isInitialized) return;
+    const stateToSave = {
+      page,
+      limit,
+      selectedSet,
+      selectedType,
+      selectedRarity,
+      selectedColor,
+      searchTerm
+    };
+    sessionStorage.setItem('adminCardFilters', JSON.stringify(stateToSave));
+  }, [page, limit, selectedSet, selectedType, selectedRarity, selectedColor, searchTerm, isInitialized]);
 
   useEffect(() => {
+    if (!isInitialized) return;
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm, isInitialized]);
+
+  // When search changes (debounced), reset to page 1
+  useEffect(() => {
+    if (!isInitialized) return;
+    // We only want to reset page if this is a genuine user search change, not the initial load
+    // Actually handled by setting page to 1 on UI interactions, let's keep it simple
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    if (!isInitialized) return;
     fetchCards();
-  }, [page, limit, selectedSet, selectedType, selectedRarity, selectedColor, debouncedSearchTerm]);
+  }, [page, limit, selectedSet, selectedType, selectedRarity, selectedColor, debouncedSearchTerm, isInitialized]);
 
   const fetchCards = async () => {
     try {
@@ -132,7 +177,7 @@ export default function AdminCardPage() {
             <input 
               type="text" 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
               placeholder="Search by card name or code..." 
               className="w-full bg-[#111] border border-[#333] rounded-md pl-4 pr-10 py-2 text-sm outline-none focus:border-[var(--primary)] text-white"
             />
