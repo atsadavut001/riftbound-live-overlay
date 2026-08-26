@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import DonateModal from "@/components/DonateModal";
 
 export default function AboutPage() {
   const [email, setEmail] = useState("");
@@ -179,54 +181,7 @@ export default function AboutPage() {
       </div>
 
       {/* Donate Modal */}
-      {showDonateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#111] border border-[var(--border)] rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
-            <button 
-              onClick={() => setShowDonateModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            
-            <h2 className="text-2xl font-bold mb-2 text-center text-white">สนับสนุนผู้พัฒนา ☕</h2>
-            <p className="text-gray-400 text-sm text-center mb-6">
-              ขอบคุณที่สนใจสนับสนุนโปรเจกต์ของเราครับ!
-            </p>
-            
-            <div className="space-y-4">
-              <div className="bg-[var(--surface)] p-4 rounded-xl border border-[var(--border)]">
-                <h3 className="font-semibold text-[var(--primary)] mb-2 text-center">พร้อมเพย์ (PromptPay)</h3>
-                <div className="bg-white p-2 rounded-lg flex items-center justify-center mb-3 mx-auto w-fit">
-                  <img 
-                    src="https://qugqegaqjrcwkxnvohvv.supabase.co/storage/v1/object/public/ZberusTCG/PromptPayQR.jpg" 
-                    alt="PromptPay QR Code" 
-                    className="w-48 h-48 object-contain rounded-md"
-                  />
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-300 font-medium text-sm">สแกนเพื่อสนับสนุนผ่านพร้อมเพย์</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center gap-4 py-2">
-                <div className="h-px bg-[var(--border)] flex-1"></div>
-                <span className="text-xs text-gray-500">หรือ</span>
-                <div className="h-px bg-[var(--border)] flex-1"></div>
-              </div>
-              
-              <a 
-                href="https://buymeacoffee.com/zberus_studio" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-3 bg-[#FFDD00] text-black hover:bg-[#FFEA00] rounded-lg transition-colors font-bold shadow-sm"
-              >
-                Buy me a coffee
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
+      {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
     </div>
   );
 }
