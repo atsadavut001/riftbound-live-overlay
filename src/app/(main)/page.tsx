@@ -24,6 +24,19 @@ export default function Home() {
           ติดต่อและผู้สนับสนุน
         </a>
       </div>
+
+      <div className="mt-16 w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-2xl border border-[var(--border)]">
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src="https://www.youtube.com/embed/BMX1IV8ePJ0" 
+          title="YouTube video player" 
+          frameBorder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          referrerPolicy="strict-origin-when-cross-origin" 
+          allowFullScreen
+        ></iframe>
+      </div>
     </div>
   );
 }
