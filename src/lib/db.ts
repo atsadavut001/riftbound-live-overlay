@@ -6,13 +6,14 @@ import { OverlayState } from "./entities/OverlayState";
 import { Card } from "./entities/Card";
 import { CardTypeTemplate } from "./entities/CardTypeTemplate";
 import { Issue } from "./entities/Issue";
+import { Deck } from "./entities/Deck";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
   synchronize: false, // ⚠️ MUST BE FALSE IN PRODUCTION DUE TO MINIFICATION
   logging: false,
-  entities: [User, OverlayState, Card, CardTypeTemplate, Issue],
+  entities: [User, OverlayState, Card, CardTypeTemplate, Issue, Deck],
   subscribers: [],
   migrations: [],
 });

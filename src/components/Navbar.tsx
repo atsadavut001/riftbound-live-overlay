@@ -2,7 +2,7 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DonateModal from "./DonateModal";
 
 export default function Navbar() {
@@ -10,6 +10,20 @@ export default function Navbar() {
   const pathname = usePathname();
   const isAdminPanel = pathname?.startsWith("/admin");
   const [showDonateModal, setShowDonateModal] = useState(false);
+  const [showDecksDropdown, setShowDecksDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDecksDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="border-b border-[var(--border)] bg-[var(--surface)]">
@@ -24,6 +38,26 @@ export default function Navbar() {
             <>
               <a href="/" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Home</a>
               <a href="/cards" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Card Library</a>
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setShowDecksDropdown(!showDecksDropdown)}
+                  className="flex items-center gap-1 text-sm font-medium hover:text-[var(--primary)] transition-colors outline-none"
+                >
+                  Decks
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {showDecksDropdown && (
+                  <div className="absolute top-full left-0 mt-2 w-40 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-1 z-50">
+                    <a href="/decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Decks Library</a>
+                    {session?.user && (
+                      <>
+                        <a href="/decks/builder" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Builder</a>
+                        <a href="/decks/my-decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>My Decks</a>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
               <a href="/about" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">About us</a>
             </>
           )}

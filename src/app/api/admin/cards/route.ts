@@ -41,9 +41,19 @@ export async function GET(req: NextRequest) {
       const colors = colorFilter.split(",");
       qb.andWhere(new Brackets(qb => {
         colors.forEach((c, i) => {
-          // OR logic for colors (if card has ANY of the selected colors)
           if (i === 0) qb.where(`card.detail->'Color' @> :color${i}`, { [`color${i}`]: `["${c}"]` });
           else qb.orWhere(`card.detail->'Color' @> :color${i}`, { [`color${i}`]: `["${c}"]` });
+        });
+      }));
+    }
+
+    const tagFilter = searchParams.get("tag");
+    if (tagFilter && tagFilter !== "") {
+      const tags = tagFilter.split(",");
+      qb.andWhere(new Brackets(qb => {
+        tags.forEach((t, i) => {
+          if (i === 0) qb.where(`card.detail->'Tag' @> :tag${i}`, { [`tag${i}`]: `["${t}"]` });
+          else qb.orWhere(`card.detail->'Tag' @> :tag${i}`, { [`tag${i}`]: `["${t}"]` });
         });
       }));
     }

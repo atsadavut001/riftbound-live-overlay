@@ -78,23 +78,54 @@ export default function AboutPage() {
 
         {/* Section 2: Roadmap */}
         <section className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 sm:p-8">
-          <h2 className="text-2xl font-semibold mb-4 text-[var(--primary)]">แผนการพัฒนาในอนาคต (Roadmap)</h2>
-          <div className="text-gray-300 space-y-4">
-            <p>เรามุ่งมั่นที่จะพัฒนาระบบให้ตอบโจทย์สตรีมเมอร์มากขึ้น นี่คือฟีเจอร์ที่เรากำลังวางแผนไว้ในอนาคต:</p>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
-                <span>อัปเดตข้อมูล Player หรืออัปเดตคะแนน</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
-                <span>Import Decklist แสดงการ์ดบนหน้า Overlay</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
-                <span>ระบบธีม (Theme) ให้ผู้ใช้ปรับแต่งสี Overlay และฟอนต์ให้เข้ากับสไตล์ของช่องตัวเอง</span>
-              </li>
-            </ul>
+          <h2 className="text-2xl font-semibold mb-4 text-[var(--primary)]">ฟีเจอร์ปัจจุบันและแผนการพัฒนา (Roadmap)</h2>
+          <div className="text-gray-300 space-y-8">
+            
+            <div>
+              <h3 className="text-xl font-medium mb-3 text-white">✨ ระบบที่เปิดใช้งานแล้ว (Current Features)</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Card Library:</strong> ฐานข้อมูลการ์ด ค้นหาและกรองการ์ดได้อย่างรวดเร็ว</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Deck Builder:</strong> ระบบจัดเด็คอัตโนมัติ พร้อมตรวจจับกฎกติกาการจัดเด็คและเตือนทันที</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Decks Library & My Decks:</strong> ดูเด็คที่เปิดสาธารณะ และจัดการเด็คส่วนตัว</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Deck View:</strong> หน้ารายละเอียดเด็ค แสดงสัดส่วนการ์ด ค่าพลังเฉลี่ย และจัดกลุ่มการ์ดให้ดูง่าย</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Live Overlay:</strong> หน้าต่างแสดงผลสำหรับนำไปใช้บน OBS, XSplit ได้ทันที</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-medium mb-3 text-white">🚀 แผนการพัฒนาในอนาคต (Upcoming Roadmap)</h3>
+              <p className="mb-4 text-sm">เรามุ่งมั่นที่จะพัฒนาระบบให้ตอบโจทย์ผู้เล่นและสตรีมเมอร์มากขึ้น นี่คือเป้าหมายถัดไปของเรา:</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
+                  <span>(รอเพิ่มแผนงานถัดไป 1)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
+                  <span>(รอเพิ่มแผนงานถัดไป 2)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
+                  <span>(รอเพิ่มแผนงานถัดไป 3)</span>
+                </li>
+              </ul>
+            </div>
+
           </div>
         </section>
 

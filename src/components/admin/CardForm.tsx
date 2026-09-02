@@ -11,7 +11,59 @@ interface CardFormProps {
 export default function CardForm({ initialData, cardId }: CardFormProps) {
   const router = useRouter();
   const [types, setTypes] = useState<any[]>([]);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const renderAbilityText = (text: string) => {
+    if (!text) return null;
+    const keywords_1FA289 = ["ACCELERATE", "HIDDEN", "LEGION", "ACTION", "REACTION", "AMBUSH"];
+    const keywords_CC2C6B = ["ASSAULT", "SHIELD", "TANK"];
+    const keywords_99B330 = ["DEFLECT", "DEATHKNELL", "GANKING", "TEMPORARY", "HUNT", "LEVEL", "EMPOWERED"];
+    const keywords_6B6F70 = ["VISION", "EQUIP", "EQULP", "PREDICT", "BURN", "EMPOWER", "ADD", "WEAPONMASTER", "STUN"];
+    const regex = /(\[[^\]]+\])/g;
+    const parts = (text || "").split(regex);
+    
+    return (
+      <>
+        {parts.map((part, i) => {
+          if (part.startsWith("[") && part.endsWith("]")) {
+            const inner = part.slice(1, -1);
+            const isNumber = /^\d+$/.test(inner) || inner.toUpperCase() === "X";
+            if (isNumber) {
+              return (
+                <span key={i} className="inline-flex items-center justify-center w-[18px] h-[18px] mx-0.5 rounded-full bg-gray-200 text-black text-[11px] font-bold align-middle shadow-sm leading-none">
+                  {inner}
+                </span>
+              );
+            }
+            const runes = ["Body", "Calm", "Chaos", "Fury", "Mind", "Order", "Rainbow"];
+            const matchedRune = runes.find(r => r.toLowerCase() === inner.toLowerCase());
+            if (matchedRune) {
+              return (
+                <img 
+                  key={i} 
+                  src={`/runes/${matchedRune}.webp`} 
+                  alt={matchedRune} 
+                  className="inline-block w-[18px] h-[18px] mx-0.5 align-middle select-none" 
+                />
+              );
+            }
+            let bgColor = "#444";
+            if (keywords_1FA289.some(kw => inner.toUpperCase().startsWith(kw))) bgColor = "#1FA289";
+            else if (keywords_CC2C6B.some(kw => inner.toUpperCase().startsWith(kw))) bgColor = "#CC2C6B";
+            else if (keywords_99B330.some(kw => inner.toUpperCase().startsWith(kw))) bgColor = "#99B330";
+            else if (keywords_6B6F70.some(kw => inner.toUpperCase().startsWith(kw))) bgColor = "#6B6F70";
+            return (
+              <span key={i} className="px-1.5 py-0.5 mx-0.5 rounded text-[10px] font-bold text-white tracking-wider align-middle shadow-sm" style={{ backgroundColor: bgColor }}>
+                {inner}
+              </span>
+            );
+          }
+          return <span key={i}>{part}</span>;
+        })}
+      </>
+    );
+  };
 
   const [formData, setFormData] = useState({
     code: initialData?.code || "",
@@ -230,7 +282,18 @@ export default function CardForm({ initialData, cardId }: CardFormProps) {
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm text-gray-400 mb-1">Image URL</label>
-            <input value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://..." className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)]" />
+            <div className="flex gap-4 items-start">
+              <input value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://..." className="flex-1 w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)]" />
+              {formData.imageUrl && (
+                <div 
+                  className="w-24 h-[134px] shrink-0 border border-[var(--border)] rounded overflow-hidden flex items-center justify-center bg-[#111] cursor-pointer hover:border-[var(--primary)] transition-colors"
+                  onClick={() => setShowPreviewModal(true)}
+                  title="Click to view full card"
+                >
+                  <img src={formData.imageUrl} alt="Preview" className="max-w-full max-h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -474,6 +537,145 @@ export default function CardForm({ initialData, cardId }: CardFormProps) {
           </button>
         </div>
       </form>
+
+      {/* Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-sm" onClick={() => setShowPreviewModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10 p-2"
+              onClick={() => setShowPreviewModal(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            {/* Left: Card Image */}
+            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center border-r border-[#333]">
+              <div className={`relative w-full max-w-sm flex items-center justify-center overflow-hidden ${formData.type === 'Battlefield' ? 'aspect-[3/2]' : 'aspect-[2/3]'}`}>
+                <img 
+                  src={formData.imageUrl} 
+                  alt={formData.code}
+                  style={formData.type === 'Battlefield' ? { transform: 'rotate(90deg)', height: '150%', width: 'auto', maxWidth: 'none' } : {}}
+                  className={`rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] ${formData.type === 'Battlefield' ? '' : 'w-full h-full object-contain'}`}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 200 300"><rect width="200" height="300" fill="%23222"/><text x="100" y="150" fill="%23666" text-anchor="middle" dominant-baseline="middle">Card Missing</text></svg>';
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Right: Card Details */}
+            <div className="w-full md:w-[55%] lg:w-[60%] p-8 overflow-y-auto max-h-[80vh]">
+              <h2 className="text-3xl font-bold mb-4">{formData.name || 'Unnamed'}, {formData.code || 'CODE'}</h2>
+              
+              {/* Badges Row 1 */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#222] border border-[#333] rounded-md text-sm font-medium">
+                  {formData.rarity && (
+                    <img 
+                      src={`/rarity/${formData.rarity.toLowerCase()}.webp`} 
+                      alt={formData.rarity} 
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                    />
+                  )}
+                  {formData.type || 'Type'}
+                </div>
+                {(Array.isArray(formData.detail?.Color) ? formData.detail.Color : (typeof formData.detail?.Color === 'string' && formData.detail.Color ? formData.detail.Color.split(',').map((s:string)=>s.trim()) : [])).map((c: string, i: number) => (
+                  <div key={`c-${i}`} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#222] border border-[#333] rounded-md text-sm font-medium">
+                    <img 
+                      src={`/runes/${c}.webp`} 
+                      alt={c} 
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                    />
+                    {c}
+                  </div>
+                ))}
+                {(Array.isArray(formData.detail?.Tag) ? formData.detail.Tag : (typeof formData.detail?.Tag === 'string' && formData.detail.Tag ? formData.detail.Tag.split(',').map((s:string)=>s.trim()) : [])).map((tag: string, i: number) => (
+                  <div key={`t-${i}`} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#222] border border-[#333] rounded-md text-sm font-medium">
+                    {tag}
+                  </div>
+                ))}
+              </div>
+
+              {/* Stats Box */}
+              {(formData.detail?.Energy || formData.detail?.Power || formData.detail?.Might) && (
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
+                    <span className="text-gray-400 text-sm mb-1">Energy</span>
+                    <span className="text-4xl font-bold">{formData.detail?.Energy || '-'}</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
+                    <span className="text-gray-400 text-sm mb-1">Power</span>
+                    <span className="text-4xl font-bold">{formData.detail?.Power || '-'}</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center bg-[#1a1a1a] border border-[#333] rounded-xl p-4">
+                    <span className="text-gray-400 text-sm mb-1">Might</span>
+                    <span className="text-4xl font-bold">{formData.detail?.Might || '-'}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {formData.detail?.Ability && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold mb-2">Ability</h3>
+                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {renderAbilityText(formData.detail?.Ability as string)}
+                  </div>
+                </div>
+              )}
+
+              {/* Flavor Text (Original) - Show only if we don't move it to Equip Section */}
+              {formData.detail?.["Flavor Text"] && (!formData.detail?.["Equip Effect"] && formData.detail?.["Equip Might"] === undefined) && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold mb-2">Flavor Text</h3>
+                  <p className="text-gray-500 italic leading-relaxed whitespace-pre-wrap">
+                    {formData.detail?.["Flavor Text"] as string}
+                  </p>
+                </div>
+              )}
+
+              {/* Equip Section */}
+              {(formData.detail?.["Equip Effect"] || formData.detail?.["Equip Might"] !== undefined) && (
+                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                  {/* Left Box: Equip Effect OR Flavor Text OR Empty space */}
+                  {formData.detail?.["Equip Effect"] ? (
+                    <div className="flex-1 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6">
+                      <h3 className="text-lg font-bold mb-2">Equip Effect</h3>
+                      <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        {renderAbilityText(formData.detail?.["Equip Effect"] as string)}
+                      </div>
+                    </div>
+                  ) : formData.detail?.["Flavor Text"] ? (
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h3 className="text-lg font-bold mb-2">Flavor Text</h3>
+                      <p className="text-gray-500 italic leading-relaxed whitespace-pre-wrap">
+                        {formData.detail?.["Flavor Text"] as string}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex-1" />
+                  )}
+
+                  {/* Right Box: Equip Might */}
+                  {formData.detail?.["Equip Might"] !== undefined && (
+                    <div className="w-full sm:w-32 bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center shrink-0">
+                      <span className="text-gray-400 text-sm mb-1 text-center">Equip Might</span>
+                      <span className="text-4xl font-bold">{formData.detail?.["Equip Might"] as string}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

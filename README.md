@@ -1,6 +1,6 @@
 <div align="center">
   <h1>🎮 Riftbound Live Overlay</h1>
-  <p><strong>Professional, web-based live streaming overlay for Riftbound broadcasts.</strong></p>
+  <p><strong>Professional, web-based live streaming overlay and deck builder for Riftbound broadcasts.</strong></p>
   <a href="https://riftbound-live-overlay.vercel.app/"><strong>🔗 Live Demo & App URL</strong></a>
 </div>
 
@@ -8,16 +8,38 @@
 
 ## 🌟 About This Project
 
-**Riftbound Live Overlay** is a dynamic, web-based streaming overlay system designed to elevate live broadcasts. Built specifically for seamless integration into broadcasting software like **OBS Studio** and **XSplit**, it delivers real-time visual elements and crucial game information directly to your viewers.
+**Riftbound Live Overlay** is a dynamic, web-based system designed to elevate live broadcasts and provide a comprehensive toolset for Riftbound players. Originally built for seamless integration into broadcasting software like OBS Studio, it has evolved into a robust platform featuring a full card library, deck builder, and community deck sharing.
 
-By focusing on a clean, professional, and informative design, this overlay ensures that your audience never misses a beat during intense live matches.
+## ✨ Current Features & Capabilities
 
-## ✨ Key Features
+### 🎴 Card Library
+- Comprehensive database of all Riftbound cards.
+- Advanced filtering by Sets, Types (Legend, Champion, Main Deck, etc.), Colors, and Rarity.
+- Real-time search by Card Name or Code.
+- Detailed **Card Modal** displaying rich text abilities with inline icons (Runes, Keywords), stats, and equip effects.
 
-- **📊 Live Data Display:** Showcases dynamic game state information, real-time card details, and player statistics instantly.
-- **🌐 Web-Based Integration:** Works flawlessly as a "Browser Source" in your streaming software. No heavy installations or downloads required!
-- **⚡ Real-Time Updates:** Instantly reacts and updates overlay components to guarantee the most accurate information on stream.
-- **🎛️ Comprehensive Management:** Features a built-in admin dashboard to effortlessly manage cards, view stats, and configure the overlay on the fly.
+### 🃏 Deck Builder & Management
+- **Interactive Deck Builder:** Drag-and-drop or click to build your perfect deck.
+- **Rule Enforcement:** Automatically validates deck requirements (1 Legend, 1 Champion sharing a tag with Legend, 3 Battlefields, 12 Runes, Min 40 Main Deck, Max 10 Sideboard).
+- **My Decks:** Manage your personal deck collection, edit drafts, and publish decks.
+- **Deck Library:** Browse public decks created by the community.
+- **Deck View:** Visual breakdown of a deck's composition, grouped cards, average energy cost, and card type distribution.
+- **Export/Import:** Easily share and import deck strings.
+
+### 📺 Live Overlay Integration
+- Works flawlessly as a "Browser Source" in your streaming software.
+- Real-time display of game state, live cards, and player stats.
+
+### 🎛️ Admin Dashboard
+- Manage cards, sets, and user configurations securely.
+
+## 🗺️ Roadmap
+
+*This section is reserved for future updates and planned features.*
+
+- [ ] *(To be added by project owner)*
+- [ ] *(To be added by project owner)*
+- [ ] *(To be added by project owner)*
 
 ## 🚀 How to Use (in OBS Studio)
 
@@ -39,5 +61,5 @@ By focusing on a clean, professional, and informative design, this overlay ensur
 ---
 
 <div align="center">
-  <sub>Designed to enhance the Riftbound streaming and viewing experience. 🚀</sub>
+  <sub>Designed to enhance the Riftbound streaming and playing experience. 🚀</sub>
 </div>
