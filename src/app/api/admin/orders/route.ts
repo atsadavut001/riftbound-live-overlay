@@ -17,7 +17,10 @@ export async function PUT(req: NextRequest) {
     const db = await getDataSource();
     const orderRepo = db.getRepository(Order);
     
-    const order = await orderRepo.findOne({ where: { id: orderId } });
+    const order = await orderRepo.findOne({ 
+      where: { id: orderId },
+      relations: { items: { shopItem: true } }
+    });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     if (action === "NEXT_STATUS") {
@@ -33,6 +36,24 @@ export async function PUT(req: NextRequest) {
       }
     } else if (action === "REJECT_SLIP") {
       order.status = "slipok_fail";
+    } else if (action === "CANCEL") {
+      if (order.status === "shipped") {
+        return NextResponse.json({ error: "Cannot cancel a shipped order" }, { status: 400 });
+      }
+      if (order.status !== "cancelled") {
+        order.status = "cancelled";
+        // Restore stock
+        const { ShopItem } = require("@/lib/entities/ShopItem");
+        const shopItemRepo = db.getRepository(ShopItem);
+        if (order.items) {
+          for (const item of order.items) {
+            if (item.shopItem) {
+              item.shopItem.quantity += item.quantity;
+              await shopItemRepo.save(item.shopItem);
+            }
+          }
+        }
+      }
     }
 
     await orderRepo.save(order);

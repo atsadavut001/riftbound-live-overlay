@@ -73,12 +73,16 @@ export default function AdminOrderPage() {
     }
   };
 
-  const handleAction = async (orderId: string, action: "NEXT_STATUS" | "REJECT_SLIP") => {
+  const handleAction = async (orderId: string, action: "NEXT_STATUS" | "REJECT_SLIP" | "CANCEL") => {
     if (action === "NEXT_STATUS" && selectedOrder?.status === "paid") {
       if (!trackingNumber.trim() || !courier.trim()) {
-        alert("กรุณากรอกเลขพัสดุและผู้จัดส่งให้ครบถ้วน");
+        alert("กรุณากรอกข้อมูลผู้จัดส่งและเลขพัสดุให้ครบถ้วน");
         return;
       }
+    }
+
+    if (action === "CANCEL") {
+      if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการยกเลิกออเดอร์นี้? (ระบบจะคืนสต๊อกสินค้าให้อัตโนมัติ)")) return;
     }
 
     setUpdating(true);
@@ -298,28 +302,34 @@ export default function AdminOrderPage() {
               )}
             </div>
             
-            <div className="p-4 bg-[#1a1a1a] border-t border-[#333] flex justify-end gap-3">
-              {(selectedOrder.status === "verifying" || selectedOrder.status === "slipok_pass" || selectedOrder.status === "slipok_fail") && (
-                <>
-                  <button onClick={() => handleAction(selectedOrder.id, "REJECT_SLIP")} disabled={updating} className="px-4 py-2 bg-[#333] hover:bg-red-500/20 hover:text-red-500 text-white text-sm font-bold rounded transition-colors border border-transparent hover:border-red-500">
-                    ปฏิเสธสลิป / ไม่ผ่าน
+              <div className="p-4 bg-[#1a1a1a] border-t border-[#333] flex items-center gap-3">
+                {selectedOrder.status !== "shipped" && selectedOrder.status !== "cancelled" && (
+                  <button onClick={() => handleAction(selectedOrder.id, "CANCEL")} disabled={updating} className="px-4 py-2 bg-red-900/40 hover:bg-red-500/80 text-red-100 text-sm font-bold rounded transition-colors mr-auto">
+                    ยกเลิกออเดอร์
                   </button>
-                  <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors">
-                    ยืนยันการชำระเงิน
+                )}
+                <div className="flex-1"></div>
+                {(selectedOrder.status === "verifying" || selectedOrder.status === "slipok_pass" || selectedOrder.status === "slipok_fail") && (
+                  <>
+                    <button onClick={() => handleAction(selectedOrder.id, "REJECT_SLIP")} disabled={updating} className="px-4 py-2 bg-[#333] hover:bg-red-500/20 hover:text-red-500 text-white text-sm font-bold rounded transition-colors border border-transparent hover:border-red-500">
+                      ปฏิเสธสลิป / ไม่ผ่าน
+                    </button>
+                    <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors">
+                      ยืนยันการชำระเงิน
+                    </button>
+                  </>
+                )}
+                
+                {selectedOrder.status === "paid" && (
+                  <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-bold rounded transition-colors">
+                    อัปเดตเป็น "จัดส่งแล้ว"
                   </button>
-                </>
-              )}
-              
-              {selectedOrder.status === "paid" && (
-                <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-bold rounded transition-colors">
-                  อัปเดตเป็น "จัดส่งแล้ว"
+                )}
+                
+                <button onClick={() => setSelectedOrder(null)} disabled={updating} className="px-4 py-2 border border-[#444] text-white hover:bg-[#333] text-sm font-bold rounded transition-colors">
+                  ปิด
                 </button>
-              )}
-              
-              <button onClick={() => setSelectedOrder(null)} disabled={updating} className="px-4 py-2 border border-[#444] text-white hover:bg-[#333] text-sm font-bold rounded transition-colors">
-                ปิด
-              </button>
-            </div>
+              </div>
           </div>
         </div>
       )}
