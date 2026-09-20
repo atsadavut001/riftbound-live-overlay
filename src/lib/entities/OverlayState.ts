@@ -1,17 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Relation } from "typeorm";
 import { User } from "./User";
+import type { User as UserType } from "./User";
 
 @Entity("overlay_states")
 export class OverlayState {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
+  @Column({ type: "uuid" })
   userId!: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "userId" })
-  user!: User;
+  user!: Relation<UserType>;
 
   @Column({ type: "jsonb", nullable: true })
   players!: any;
@@ -25,7 +26,7 @@ export class OverlayState {
   @Column({ type: "jsonb", nullable: true })
   cards!: any;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   format!: string;
 
   @Column({ type: "int", default: 8 })
@@ -43,9 +44,9 @@ export class OverlayState {
   @Column({ type: "varchar", default: "none" })
   layout!: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt!: Date;
 }

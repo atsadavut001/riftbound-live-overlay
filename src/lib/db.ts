@@ -7,13 +7,17 @@ import { Card } from "./entities/Card";
 import { CardTypeTemplate } from "./entities/CardTypeTemplate";
 import { Issue } from "./entities/Issue";
 import { Deck } from "./entities/Deck";
+import { ShopItem } from "./entities/ShopItem";
+import { Order } from "./entities/Order";
+import { OrderItem } from "./entities/OrderItem";
+import { Address } from "./entities/Address";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
   synchronize: false, // ⚠️ MUST BE FALSE IN PRODUCTION DUE TO MINIFICATION
   logging: false,
-  entities: [User, OverlayState, Card, CardTypeTemplate, Issue, Deck],
+  entities: [User, OverlayState, Card, CardTypeTemplate, Issue, Deck, ShopItem, Order, OrderItem, Address],
   subscribers: [],
   migrations: [],
 });

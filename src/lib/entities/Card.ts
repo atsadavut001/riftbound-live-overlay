@@ -5,27 +5,33 @@ export class Card {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   code!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   name!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   type!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   rarity!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   imageUrl!: string;
 
   @Column("jsonb", { default: {} })
   detail!: any;
 
-  @CreateDateColumn()
+  @Column({ type: "varchar", nullable: true })
+  refTcgThId!: string;
+
+  @Column({ type: "varchar", nullable: true })
+  refTcgPlayerId!: string;
+
+  @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt!: Date;
 }

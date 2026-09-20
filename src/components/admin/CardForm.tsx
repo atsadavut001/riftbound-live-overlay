@@ -71,6 +71,8 @@ export default function CardForm({ initialData, cardId }: CardFormProps) {
     type: initialData?.type || "",
     rarity: initialData?.rarity || "",
     imageUrl: initialData?.imageUrl || "",
+    refTcgThId: initialData?.refTcgThId || "",
+    refTcgPlayerId: initialData?.refTcgPlayerId || "",
     detail: initialData?.detail || {}
   });
 
@@ -294,6 +296,14 @@ export default function CardForm({ initialData, cardId }: CardFormProps) {
                 </div>
               )}
             </div>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Ref TCG TH ID <span className="text-gray-600 text-xs">(optional - for price sync)</span></label>
+            <input value={formData.refTcgThId} onChange={e => setFormData({...formData, refTcgThId: e.target.value})} className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)]" />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Ref TCG Player ID <span className="text-gray-600 text-xs">(optional - for price sync)</span></label>
+            <input value={formData.refTcgPlayerId} onChange={e => setFormData({...formData, refTcgPlayerId: e.target.value})} className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)]" />
           </div>
         </div>
 

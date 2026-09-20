@@ -1,26 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne } from "typeorm";
-import { OverlayState } from "./OverlayState";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity("users")
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   email!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   name!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   image!: string;
 
-  @Column({ default: false })
+  @Column({ type: "boolean", default: false })
   isAdmin!: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt!: Date;
 }

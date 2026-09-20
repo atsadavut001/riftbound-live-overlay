@@ -109,6 +109,8 @@ export async function POST(req: NextRequest) {
       type: body.type,
       rarity: body.rarity,
       imageUrl: body.imageUrl,
+      refTcgThId: body.refTcgThId,
+      refTcgPlayerId: body.refTcgPlayerId,
       detail: body.detail || {}
     });
 

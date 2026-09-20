@@ -13,6 +13,33 @@ export default function Navbar() {
   const [showDecksDropdown, setShowDecksDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [cartCount, setCartCount] = useState(0);
+
+  const fetchCart = async () => {
+    if (!session?.user) return;
+    try {
+      const res = await fetch(`/api/cart?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        const items = data?.items || [];
+        const count = items.reduce((acc: number, item: any) => acc + item.quantity, 0);
+        setCartCount(count);
+      }
+    } catch (err) {}
+  };
+
+  useEffect(() => {
+    fetchCart();
+    
+    const handleCartUpdate = () => {
+      fetchCart();
+    };
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, [session?.user]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,14 +56,19 @@ export default function Navbar() {
     <header className="border-b border-[var(--border)] bg-[var(--surface)]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
         <div className="flex items-center gap-4">
-          <a href="/" className="text-xl font-bold text-[var(--primary)]">
-            Riftbound Overlay
+          <a href={pathname?.startsWith("/shop") ? "/shop" : "/"} className="text-xl font-bold text-[var(--primary)]">
+            {pathname?.startsWith("/shop") ? "Riftbound Zberus Shop" : "Riftbound Overlay"}
           </a>
         </div>
         <div className="flex items-center gap-6">
-          {!isAdminPanel && (
+          {pathname?.startsWith("/shop") ? (
+            <a href="/" className="text-sm font-medium bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
+              กลับสู่หน้าหลัก Overlay
+            </a>
+          ) : !isAdminPanel && (
             <>
               <a href="/" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Home</a>
+              <a href="/shop" target="_blank" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Shop</a>
               <a href="/cards" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Card Library</a>
               <div className="relative" ref={dropdownRef}>
                 <button 
@@ -64,7 +96,7 @@ export default function Navbar() {
           
           {session?.user ? (
             <div className="flex items-center gap-4">
-              {!isAdminPanel && (
+              {!isAdminPanel && !pathname?.startsWith("/shop") && (
                 <>
                   <a href="/overlapanal" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
                     Overlay
@@ -89,6 +121,22 @@ export default function Navbar() {
                     User Panel
                   </a>
                 )}
+                {!isAdminPanel && pathname?.startsWith("/shop") && !(session.user as any).isAdmin && (
+                  <>
+                    <a href="/shop/orders" className="text-sm font-medium text-gray-400 hover:text-[var(--primary)] transition-colors mr-4">
+                      ประวัติการสั่งซื้อ
+                    </a>
+                    <a href="/shop/cart" className="text-gray-400 hover:text-[var(--primary)] transition-colors relative flex items-center justify-center mr-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1.5 -right-2 bg-[var(--primary)] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                          {cartCount > 99 ? '99+' : cartCount}
+                        </span>
+                      )}
+                    </a>
+                  </>
+                )}
+
                 <div className="flex items-center gap-2">
                   {session.user.image && (
                   <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-600" />
