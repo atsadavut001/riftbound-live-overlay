@@ -1,13 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+const MultiSelect = ({ label, options, selected, onChange }: { label: string, options: {label: string, value: string}[], selected: string[], onChange: (v: string[]) => void }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative flex-1 min-w-[120px]" ref={ref}>
+      <div 
+        className="flex items-center gap-2 bg-[#111] border border-[#333] rounded-md px-3 py-1.5 cursor-pointer"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="text-xs text-gray-500">{label}</span>
+        <div className="text-sm text-gray-300 flex-1 truncate">
+          {selected.length === 0 ? "All" : selected.map(v => options.find(o => o.value === v)?.label || v).join(", ")}
+        </div>
+        <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </div>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-full bg-[#1a1a1a] border border-[#333] rounded-md z-50 py-1 shadow-xl max-h-60 overflow-y-auto">
+          {options.map(opt => (
+            <label key={opt.value} className="flex items-center gap-2 px-3 py-1.5 hover:bg-[#222] cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={selected.includes(opt.value)}
+                onChange={(e) => {
+                  if (e.target.checked) onChange([...selected, opt.value]);
+                  else onChange(selected.filter(v => v !== opt.value));
+                }}
+                className="accent-[var(--primary)]"
+              />
+              <span className="text-sm text-gray-300">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function AdminShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  
+  const [selectedSet, setSelectedSet] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
+  const [selectedRarity, setSelectedRarity] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string[]>([]);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -45,19 +101,49 @@ export default function AdminShopPage() {
   };
 
   const filteredItems = items.filter(item => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    const name = (item.card?.name || "").toLowerCase();
-    const code = (item.card?.code || "").toLowerCase();
-    const print = (item.print || "Normal").toLowerCase();
-    return name.includes(s) || code.includes(s) || print.includes(s);
+    let match = true;
+    
+    // Search filter
+    if (search) {
+      const s = search.toLowerCase();
+      const name = (item.card?.name || "").toLowerCase();
+      const code = (item.card?.code || "").toLowerCase();
+      const print = (item.print || "Normal").toLowerCase();
+      if (!name.includes(s) && !code.includes(s) && !print.includes(s)) match = false;
+    }
+
+    // Set filter (by code prefix)
+    if (match && selectedSet.length > 0) {
+      const code = item.card?.code || "";
+      const setMatch = selectedSet.some(set => code.startsWith(`${set}-`));
+      if (!setMatch) match = false;
+    }
+
+    // Type filter
+    if (match && selectedType.length > 0) {
+      if (!selectedType.includes(item.card?.type)) match = false;
+    }
+
+    // Rarity filter
+    if (match && selectedRarity.length > 0) {
+      if (!selectedRarity.includes(item.card?.rarity)) match = false;
+    }
+
+    // Color filter
+    if (match && selectedColor.length > 0) {
+      const colors = item.card?.detail?.Color || [];
+      const colorMatch = selectedColor.some(c => colors.includes(c));
+      if (!colorMatch) match = false;
+    }
+
+    return match;
   });
 
   return (
-    <div>
+    <div className="flex flex-col h-full overflow-y-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Shop Management</h1>
+          <h1 className="text-3xl font-bold mb-2 text-[var(--primary)]">Shop Management</h1>
           <p className="text-gray-400">Manage Zberus Shop inventory and prices</p>
         </div>
         <Link 
@@ -68,17 +154,81 @@ export default function AdminShopPage() {
         </Link>
       </div>
 
-      <div className="mb-6">
-        <input 
-          type="text" 
-          placeholder="ค้นหาด้วยชื่อการ์ด หรือ รหัสการ์ด (Code)..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md bg-[#111] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[var(--primary)] transition-colors"
-        />
+      <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex-1 relative">
+            <input 
+              type="text" 
+              placeholder="Search by card name, code, or print..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-[#111] border border-[#333] rounded-md pl-4 pr-10 py-2 text-sm outline-none focus:border-[var(--primary)] text-white"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6">
+          {/* Factions */}
+          <div className="flex gap-2">
+            {['Fury', 'Calm', 'Mind', 'Order', 'Chaos', 'Body'].map((rune) => (
+              <button 
+                key={rune} 
+                onClick={() => { 
+                  setSelectedColor(prev => prev.includes(rune) ? prev.filter(r => r !== rune) : [...prev, rune]); 
+                }}
+                className={`w-9 h-9 rounded-full border flex items-center justify-center hover:opacity-80 transition-all ${selectedColor.includes(rune) ? 'border-[var(--primary)] bg-[#222]' : 'border-[#444] bg-transparent'}`} 
+                title={rune}
+              >
+                <img src={`/runes/${rune}.webp`} alt={rune} className="w-6 h-6 object-contain" onError={(e) => (e.target as HTMLImageElement).style.display = 'none'} />
+              </button>
+            ))}
+          </div>
+
+          {/* Selects */}
+          <div className="flex flex-wrap gap-4 flex-1">
+            <MultiSelect 
+              label="Set" 
+              options={[
+                {label: "Origins [OGN]", value: "OGN"},
+                {label: "Spiritforged [SFD]", value: "SFD"},
+                {label: "Unleashed [UNL]", value: "UNL"},
+                {label: "Vendetta [VEN]", value: "VEN"},
+                {label: "Proving Grounds [OGS]", value: "OGS"},
+                {label: "Arcane Box Set [ARC]", value: "ARC"}
+              ]} 
+              selected={selectedSet} 
+              onChange={setSelectedSet} 
+            />
+            <MultiSelect 
+              label="Type" 
+              options={[
+                {label: "Legend", value: "Legend"},
+                {label: "Battlefield", value: "Battlefield"},
+                {label: "Unit", value: "Unit"},
+                {label: "Gear", value: "Gear"},
+                {label: "Spell", value: "Spell"},
+                {label: "Rune", value: "Rune"}
+              ]} 
+              selected={selectedType} 
+              onChange={setSelectedType} 
+            />
+            <MultiSelect 
+              label="Rarity" 
+              options={[
+                {label: "Common", value: "Common"},
+                {label: "Uncommon", value: "Uncommon"},
+                {label: "Rare", value: "Rare"},
+                {label: "Epic", value: "Epic"},
+                {label: "Showcase", value: "Showcase"}
+              ]} 
+              selected={selectedRarity} 
+              onChange={setSelectedRarity} 
+            />
+          </div>
+        </div>
       </div>
       
-      <div className="bg-[#111] border border-[#333] rounded-xl overflow-hidden">
+      <div className="bg-[#111] border border-[#333] rounded-xl overflow-hidden flex-1 flex flex-col">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading shop items...</div>
         ) : items.length === 0 ? (
