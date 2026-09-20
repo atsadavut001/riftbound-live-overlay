@@ -101,8 +101,12 @@ export default function AboutPage() {
                   <span><strong>Deck View:</strong> หน้ารายละเอียดเด็ค แสดงสัดส่วนการ์ด ค่าพลังเฉลี่ย และจัดกลุ่มการ์ดให้ดูง่าย</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
-                  <span><strong>Live Overlay:</strong> หน้าต่างแสดงผลสำหรับนำไปใช้บน OBS, XSplit ได้ทันที</span>
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">▶</span>
+                  <span><strong>Live Overlay:</strong> ใช้งานเป็นโอเวอร์เลย์ระหว่างสตรีมสดใน OBS, XSplit ได้ทันที</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">🛒</span>
+                  <span><strong>Card Shop & Order Management:</strong> ระบบสั่งซื้อการ์ดที่รองรับระบบชำระเงินอัตโนมัติด้วย PromptPay พร้อมตรวจสอบสลิปอัตโนมัติ และติดตามสถานะออเดอร์</span>
                 </li>
               </ul>
             </div>
@@ -112,16 +116,24 @@ export default function AboutPage() {
               <p className="mb-4 text-sm">เรามุ่งมั่นที่จะพัฒนาระบบให้ตอบโจทย์ผู้เล่นและสตรีมเมอร์มากขึ้น นี่คือเป้าหมายถัดไปของเรา:</p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
-                  <span>(รอเพิ่มแผนงานถัดไป 1)</span>
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>E-Commerce System:</strong> ระบบร้านค้า, ตะกร้าสินค้า, และชำระเงินอัตโนมัติ (เสร็จสิ้น)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Automated Payment:</strong> ระบบสร้าง QR Code PromptPay และตรวจสอบสลิปอัตโนมัติผ่าน SlipOK (เสร็จสิ้น)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">●</span>
+                  <span><strong>Tournament & Standings:</strong> ระบบจัดการการแข่งขันทัวร์นาเมนต์และตารางคะแนนผู้เล่นสด (กำลังพัฒนา)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
-                  <span>(รอเพิ่มแผนงานถัดไป 2)</span>
+                  <span><strong>Stream Enhancements:</strong> เพิ่มแอนิเมชันสำหรับ Overlay และ Widgetโต้ตอบกับแชท Twitch/YouTube (อนาคต)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-700/50 text-gray-400 flex items-center justify-center text-sm font-bold">...</span>
-                  <span>(รอเพิ่มแผนงานถัดไป 3)</span>
+                  <span><strong>Smart Notifications:</strong> ระบบแจ้งเตือนสถานะออเดอร์และการจัดส่งอัตโนมัติผ่าน LINE/Email (อนาคต)</span>
                 </li>
               </ul>
             </div>
