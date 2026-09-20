@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
   const router = useRouter();
   const [cards, setCards] = useState<any[]>([]);
+  const [selectedCardObj, setSelectedCardObj] = useState<any>(null);
   const [formData, setFormData] = useState({
     cardId: "",
     price: 0,
@@ -21,11 +22,15 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
+    // If we just selected a card and the search term is precisely the code-name, don't trigger search again
+    if (selectedCardObj && searchTerm === `${selectedCardObj.code} - ${selectedCardObj.name}`) {
+      return;
+    }
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 300);
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, selectedCardObj]);
 
   useEffect(() => {
     if (shopItemId) return; // Don't search if we are editing
@@ -60,6 +65,7 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
             });
             if (data.card) {
               setCards([data.card]);
+              setSelectedCardObj(data.card);
             }
           }
         }
@@ -141,6 +147,7 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
                         className="px-3 py-2 hover:bg-[var(--primary)] hover:text-white cursor-pointer text-sm text-gray-300 transition-colors"
                         onClick={() => {
                           setFormData({ ...formData, cardId: c.id });
+                          setSelectedCardObj(c);
                           setSearchTerm(`${c.code} - ${c.name}`);
                           setIsDropdownOpen(false);
                         }}
@@ -156,27 +163,21 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
           )}
           {shopItemId && <p className="text-xs text-gray-500 mt-1">Card cannot be changed once created.</p>}
           
-          {(() => {
-            const selectedCard = cards.find(c => c.id === formData.cardId);
-            if (selectedCard) {
-              return (
-                <div className="mt-4 p-4 bg-[#111] border border-[#333] rounded-lg flex gap-4 items-center">
-                  <div className="w-20 h-28 flex-shrink-0 bg-black rounded-md overflow-hidden border border-[#444]">
-                    {selectedCard.imageUrl ? (
-                      <img src={selectedCard.imageUrl} alt={selectedCard.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-600">No img</div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white text-lg">{selectedCard.name}</h3>
-                    <p className="text-sm text-gray-400 mt-1">{selectedCard.code} &bull; {selectedCard.type} &bull; {selectedCard.rarity}</p>
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })()}
+          {selectedCardObj && (
+            <div className="mt-4 p-4 bg-[#111] border border-[#333] rounded-lg flex gap-4 items-center">
+              <div className="w-20 h-28 flex-shrink-0 bg-black rounded-md overflow-hidden border border-[#444]">
+                {selectedCardObj.imageUrl ? (
+                  <img src={selectedCardObj.imageUrl} alt={selectedCardObj.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-600">No img</div>
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-white text-lg">{selectedCardObj.name}</h3>
+                <p className="text-sm text-gray-400 mt-1">{selectedCardObj.code} &bull; {selectedCardObj.type} &bull; {selectedCardObj.rarity}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
