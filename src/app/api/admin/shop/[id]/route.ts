@@ -28,7 +28,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Note: cardId is intentionally omitted so it cannot be updated
     repo.merge(item, {
       price: body.price,
-      quantity: body.quantity
+      quantity: body.quantity,
+      print: body.print
     });
 
     await repo.save(item);

@@ -20,6 +20,9 @@ export class ShopItem {
   @Column("int", { default: 0 })
   quantity!: number;
 
+  @Column({ type: "varchar", default: "Normal" })
+  print!: string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

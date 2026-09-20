@@ -125,7 +125,14 @@ export default function CartPage() {
                     <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                       <div>
                         <h3 className="font-bold text-white text-base truncate">{card.name}</h3>
-                        <p className="text-xs text-gray-400">{card.code} {card.rarity}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-xs text-gray-400">{card.code} {card.rarity}</p>
+                          {item.shopItem?.print && item.shopItem.print !== 'Normal' && (
+                            <span className="bg-purple-900/40 text-purple-400 text-[10px] px-1.5 py-0 rounded font-bold border border-purple-800/50">
+                              {item.shopItem.print}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="mt-4 flex items-center gap-4">

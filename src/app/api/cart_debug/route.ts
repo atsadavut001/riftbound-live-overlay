@@ -1,10 +1,13 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getDataSource } from '@/lib/db';
-import { ShopItem } from '@/lib/entities/ShopItem';
 
 export async function GET() {
-  const db = await getDataSource();
-  const items = await db.getRepository(ShopItem).find({ relations: { card: true }});
-  return NextResponse.json(items.map(i => ({ name: i.card.name, quantity: i.quantity })));
+  try {
+    const db = await getDataSource();
+    await db.query(`ALTER TABLE shop_item ADD COLUMN IF NOT EXISTS print VARCHAR DEFAULT 'Normal';`);
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

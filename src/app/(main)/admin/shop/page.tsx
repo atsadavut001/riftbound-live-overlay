@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function AdminShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -43,6 +44,14 @@ export default function AdminShopPage() {
     }
   };
 
+  const filteredItems = items.filter(item => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    const name = (item.card?.name || "").toLowerCase();
+    const code = (item.card?.code || "").toLowerCase();
+    return name.includes(s) || code.includes(s);
+  });
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -57,6 +66,16 @@ export default function AdminShopPage() {
           + Add Shop Item
         </Link>
       </div>
+
+      <div className="mb-6">
+        <input 
+          type="text" 
+          placeholder="ค้นหาด้วยชื่อการ์ด หรือ รหัสการ์ด (Code)..." 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full max-w-md bg-[#111] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[var(--primary)] transition-colors"
+        />
+      </div>
       
       <div className="bg-[#111] border border-[#333] rounded-xl overflow-hidden">
         {loading ? (
@@ -66,6 +85,10 @@ export default function AdminShopPage() {
             <div className="text-4xl mb-3">🛒</div>
             <p>No items in the shop yet.</p>
             <p className="text-sm mt-1">Click "Add Shop Item" to list a card for sale.</p>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 flex flex-col items-center">
+            <p>ไม่พบสินค้าที่ค้นหา</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -80,7 +103,7 @@ export default function AdminShopPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#222]">
-                {items.map((item) => (
+                {filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-[#1a1a1a] transition-colors group">
                     <td className="p-4 w-24">
                       {item.card?.imageUrl ? (
@@ -91,8 +114,9 @@ export default function AdminShopPage() {
                     </td>
                     <td className="p-4">
                       <div className="font-bold text-lg mb-1">{item.card?.name || 'Unknown Card'}</div>
-                      <div className="flex gap-2 text-sm text-gray-400">
+                      <div className="flex gap-2 text-sm text-gray-400 mt-1">
                         <span className="bg-[#222] px-2 py-0.5 rounded">{item.card?.code || 'N/A'}</span>
+                        <span className="bg-purple-900/40 text-purple-400 px-2 py-0.5 rounded border border-purple-800/50">{item.print || 'Normal'}</span>
                         <span>{item.card?.type}</span>
                         <span>{item.card?.rarity}</span>
                       </div>

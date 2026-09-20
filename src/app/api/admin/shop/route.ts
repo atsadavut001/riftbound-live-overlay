@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       cardId: body.cardId,
       price: body.price || 0,
       quantity: body.quantity || 0,
+      print: body.print || "Normal",
     });
 
     await repo.save(newItem);

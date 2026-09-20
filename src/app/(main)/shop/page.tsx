@@ -329,12 +329,19 @@ export default function ShopPage() {
                         >
                           {card.name}
                         </h3>
-                        <div className="text-[11px] text-gray-400 font-medium mt-1">{card.code} {card.rarity || 'C'}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="text-[11px] text-gray-400 font-medium">{card.code} {card.rarity || 'C'}</div>
+                          {item.print && item.print !== 'Normal' && (
+                            <span className="bg-purple-900/40 text-purple-400 text-[9px] px-1.5 py-0 rounded font-bold border border-purple-800/50 flex-shrink-0">
+                              {item.print}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex border border-[#333] rounded-lg overflow-hidden mt-3 h-[42px]">
                         <div className="flex-1 px-1 py-1 text-center border-r border-[#333] bg-[#111]">
-                          <div className="text-[9px] text-gray-500">จำนวน</div>
+                          <div className="text-[9px] text-gray-500">คงเหลือ</div>
                           <div className="font-bold text-white text-xs leading-none mt-1">{item.quantity}</div>
                         </div>
                         <div className="flex-1 px-1 py-1 text-center border-r border-[#333] bg-[#111]">
@@ -453,7 +460,14 @@ export default function ShopPage() {
 
             {/* Right: Card Details */}
             <div className="w-full md:w-[55%] lg:w-[60%] p-8 overflow-y-auto max-h-[80vh] flex flex-col">
-              <h2 className="text-3xl font-bold mb-4">{selectedItem.card.name}, {selectedItem.card.code}</h2>
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-3xl font-bold">{selectedItem.card.name}, {selectedItem.card.code}</h2>
+                {selectedItem.print && selectedItem.print !== 'Normal' && (
+                  <span className="bg-purple-900/40 text-purple-400 text-sm px-2.5 py-1 rounded font-bold border border-purple-800/50 mt-1">
+                    {selectedItem.print}
+                  </span>
+                )}
+              </div>
               
               {/* Badges Row 1 */}
               <div className="flex flex-wrap gap-3 mb-6">

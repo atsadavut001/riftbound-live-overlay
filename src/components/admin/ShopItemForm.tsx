@@ -9,7 +9,8 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
   const [formData, setFormData] = useState({
     cardId: "",
     price: 0,
-    quantity: 0
+    quantity: 0,
+    print: "Normal"
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -54,7 +55,8 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
             setFormData({
               cardId: data.cardId,
               price: data.price,
-              quantity: data.quantity
+              quantity: data.quantity,
+              print: data.print || "Normal"
             });
             if (data.card) {
               setCards([data.card]);
@@ -153,6 +155,19 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
             </div>
           )}
           {shopItemId && <p className="text-xs text-gray-500 mt-1">Card cannot be changed once created.</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm text-gray-400 mb-1">การพิมพ์ (Print)</label>
+          <select 
+            value={formData.print} 
+            onChange={(e) => setFormData({...formData, print: e.target.value})}
+            className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)] text-white"
+          >
+            <option value="Normal">Normal</option>
+            <option value="Foil">Foil</option>
+            <option value="Pomo">Pomo</option>
+          </select>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
