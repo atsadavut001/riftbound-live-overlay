@@ -64,6 +64,9 @@ export default function AdminShopPage() {
   const [selectedRarity, setSelectedRarity] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string[]>([]);
 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -139,6 +142,9 @@ export default function AdminShopPage() {
     return match;
   });
 
+  const totalPages = Math.ceil(filteredItems.length / limit) || 1;
+  const paginatedItems = filteredItems.slice((page - 1) * limit, page * limit);
+
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       <div className="flex justify-between items-center mb-8">
@@ -161,7 +167,7 @@ export default function AdminShopPage() {
               type="text" 
               placeholder="Search by card name, code, or print..." 
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full bg-[#111] border border-[#333] rounded-md pl-4 pr-10 py-2 text-sm outline-none focus:border-[var(--primary)] text-white"
             />
           </div>
@@ -175,6 +181,7 @@ export default function AdminShopPage() {
                 key={rune} 
                 onClick={() => { 
                   setSelectedColor(prev => prev.includes(rune) ? prev.filter(r => r !== rune) : [...prev, rune]); 
+                  setPage(1);
                 }}
                 className={`w-9 h-9 rounded-full border flex items-center justify-center hover:opacity-80 transition-all ${selectedColor.includes(rune) ? 'border-[var(--primary)] bg-[#222]' : 'border-[#444] bg-transparent'}`} 
                 title={rune}
@@ -197,7 +204,7 @@ export default function AdminShopPage() {
                 {label: "Arcane Box Set [ARC]", value: "ARC"}
               ]} 
               selected={selectedSet} 
-              onChange={setSelectedSet} 
+              onChange={(val) => { setSelectedSet(val); setPage(1); }} 
             />
             <MultiSelect 
               label="Type" 
@@ -210,7 +217,7 @@ export default function AdminShopPage() {
                 {label: "Rune", value: "Rune"}
               ]} 
               selected={selectedType} 
-              onChange={setSelectedType} 
+              onChange={(val) => { setSelectedType(val); setPage(1); }} 
             />
             <MultiSelect 
               label="Rarity" 
@@ -222,7 +229,7 @@ export default function AdminShopPage() {
                 {label: "Showcase", value: "Showcase"}
               ]} 
               selected={selectedRarity} 
-              onChange={setSelectedRarity} 
+              onChange={(val) => { setSelectedRarity(val); setPage(1); }} 
             />
           </div>
         </div>
@@ -254,7 +261,7 @@ export default function AdminShopPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#222]">
-                {filteredItems.map((item) => (
+                {paginatedItems.map((item) => (
                   <tr key={item.id} className="hover:bg-[#1a1a1a] transition-colors group">
                     <td className="p-4 w-24">
                       {item.card?.imageUrl ? (
@@ -302,6 +309,43 @@ export default function AdminShopPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && items.length > 0 && filteredItems.length > 0 && (
+          <div className="p-4 border-t border-[var(--border)] flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#111]">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>Show</span>
+              <select 
+                value={limit} 
+                onChange={e => { setLimit(Number(e.target.value)); setPage(1); }}
+                className="bg-[#222] border border-gray-700 rounded px-2 py-1 outline-none text-white"
+              >
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="ml-2">items. Total: <span className="font-bold text-white">{filteredItems.length}</span></span>
+            </div>
+            <div className="flex gap-2 items-center">
+              <button 
+                disabled={page <= 1} 
+                onClick={() => setPage(page - 1)}
+                className="px-3 py-1 bg-[#222] rounded hover:bg-[#333] disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <span className="text-sm text-gray-400 px-2">Page {page} of {totalPages}</span>
+              <button 
+                disabled={page >= totalPages} 
+                onClick={() => setPage(page + 1)}
+                className="px-3 py-1 bg-[#222] rounded hover:bg-[#333] disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
