@@ -155,6 +155,28 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
             </div>
           )}
           {shopItemId && <p className="text-xs text-gray-500 mt-1">Card cannot be changed once created.</p>}
+          
+          {(() => {
+            const selectedCard = cards.find(c => c.id === formData.cardId);
+            if (selectedCard) {
+              return (
+                <div className="mt-4 p-4 bg-[#111] border border-[#333] rounded-lg flex gap-4 items-center">
+                  <div className="w-20 h-28 flex-shrink-0 bg-black rounded-md overflow-hidden border border-[#444]">
+                    {selectedCard.imageUrl ? (
+                      <img src={selectedCard.imageUrl} alt={selectedCard.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-600">No img</div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg">{selectedCard.name}</h3>
+                    <p className="text-sm text-gray-400 mt-1">{selectedCard.code} &bull; {selectedCard.type} &bull; {selectedCard.rarity}</p>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         <div>
