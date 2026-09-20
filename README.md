@@ -30,16 +30,25 @@
 - Works flawlessly as a "Browser Source" in your streaming software.
 - Real-time display of game state, live cards, and player stats.
 
+### 🛒 Card Shop & E-Commerce
+- **Storefront:** Browse cards for sale and easily add them to your shopping cart.
+- **Checkout & Payment:** Seamless checkout process featuring automated PromptPay QR Code generation.
+- **Smart Verification:** Automated payment slip verification via the SlipOK API.
+- **Order Tracking:** Users can view their order history, check shipping status with tracking numbers, or cancel pending orders.
+- **Stock Management:** Real-time inventory deduction upon checkout and automatic restock for cancelled orders.
+
 ### 🎛️ Admin Dashboard
-- Manage cards, sets, and user configurations securely.
+- **Content Management:** Securely manage the card database, sets, and user configurations.
+- **Shop Inventory:** Control shop listings, adjust pricing, and restock quantities.
+- **Order Management:** Review user orders, verify payment slips, update statuses, and input courier tracking details.
 
-## 🗺️ Roadmap
+## 🚀 Roadmap
 
-*This section is reserved for future updates and planned features.*
-
-- [ ] *(To be added by project owner)*
-- [ ] *(To be added by project owner)*
-- [ ] *(To be added by project owner)*
+- [x] Complete Card Library and Deck Builder capabilities.
+- [x] Build robust E-Commerce system (Cart, Checkout, PromptPay, Slip Verification).
+- [ ] Implement Tournament brackets and live player standings tracking.
+- [ ] Add advanced overlay animations and interactive Twitch/YouTube chat widgets.
+- [ ] Automated email/line notifications for order tracking and shipping updates.
 
 ## 🚀 How to Use (in OBS Studio)
 
