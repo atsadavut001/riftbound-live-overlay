@@ -49,7 +49,8 @@ export default function AdminShopPage() {
     const s = search.toLowerCase();
     const name = (item.card?.name || "").toLowerCase();
     const code = (item.card?.code || "").toLowerCase();
-    return name.includes(s) || code.includes(s);
+    const print = (item.print || "Normal").toLowerCase();
+    return name.includes(s) || code.includes(s) || print.includes(s);
   });
 
   return (

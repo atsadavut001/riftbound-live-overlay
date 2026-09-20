@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       .leftJoinAndSelect("shopItem.card", "card");
 
     if (search) {
-      qb = qb.andWhere("(card.name ILIKE :search OR card.code ILIKE :search)", { search: `%${search}%` });
+      qb = qb.andWhere("(card.name ILIKE :search OR card.code ILIKE :search OR shopItem.print ILIKE :search)", { search: `%${search}%` });
     }
     
     if (set) {
