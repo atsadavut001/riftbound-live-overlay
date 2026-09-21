@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDataSource } from "@/lib/db";
+import { getSafeRepository } from "@/lib/db";
 import { ShopItem } from "@/lib/entities/ShopItem";
 
 export async function GET(req: NextRequest) {
@@ -13,8 +13,7 @@ export async function GET(req: NextRequest) {
     const rarity = searchParams.get('rarity') || '';
     const color = searchParams.get('color') || '';
 
-    const db = await getDataSource();
-    const repo = db.getRepository(ShopItem);
+    const repo = await getSafeRepository<ShopItem>("shop_item");
     
     let qb = repo.createQueryBuilder("shopItem")
       .leftJoinAndSelect("shopItem.card", "card");

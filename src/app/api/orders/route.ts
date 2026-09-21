@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { getDataSource } from "@/lib/db";
+import { getDataSource, getSafeRepository } from "@/lib/db";
 import { Order } from "@/lib/entities/Order";
 import { ShopItem } from "@/lib/entities/ShopItem";
 
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       .getMany();
 
     if (expiredOrders.length > 0) {
-      const shopItemRepo = db.getRepository(ShopItem);
+      const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
       for (const order of expiredOrders) {
         order.status = "cancelled";
         if (order.items) {
@@ -90,7 +90,7 @@ export async function PUT(req: NextRequest) {
     order.status = "cancelled";
 
     // Restore stock
-    const shopItemRepo = db.getRepository(ShopItem);
+    const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
     if (order.items) {
       for (const item of order.items) {
         if (item.shopItem) {

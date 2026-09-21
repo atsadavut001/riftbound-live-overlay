@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { getDataSource } from "@/lib/db";
+import { getDataSource, getSafeRepository } from "@/lib/db";
 import { Order } from "@/lib/entities/Order";
 import { ShopItem } from "@/lib/entities/ShopItem";
 import promptpayQr from "promptpay-qr";
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       });
       
       if (orderWithItems && orderWithItems.items) {
-        const shopItemRepo = db.getRepository(ShopItem);
+        const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
         
         // Deduct stock
         for (const item of orderWithItems.items) {

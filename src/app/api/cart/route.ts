@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { getDataSource } from "@/lib/db";
+import { getDataSource, getSafeRepository } from "@/lib/db";
 import { Order } from "@/lib/entities/Order";
 import { OrderItem } from "@/lib/entities/OrderItem";
 import { ShopItem } from "@/lib/entities/ShopItem";
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const { shopItemId, quantity = 1 } = body;
     
     const db = await getDataSource();
-    const shopItemRepo = db.getRepository(ShopItem);
+    const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
     const orderRepo = db.getRepository(Order);
     const orderItemRepo = db.getRepository(OrderItem);
     

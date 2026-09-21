@@ -28,3 +28,10 @@ export const getDataSource = async () => {
   }
   return AppDataSource;
 };
+
+export const getSafeRepository = async <T>(tableName: string) => {
+  const db = await getDataSource();
+  const metadata = db.entityMetadatas.find(meta => meta.tableName === tableName);
+  if (!metadata) throw new Error(`Entity metadata for table ${tableName} not found`);
+  return db.getRepository<T>(metadata.target);
+};
