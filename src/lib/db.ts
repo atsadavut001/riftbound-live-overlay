@@ -25,6 +25,13 @@ export const AppDataSource = new DataSource({
 export const getDataSource = async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
+    
+    // Auto-migrate new columns safely without full synchronize
+    try {
+      await AppDataSource.query(`ALTER TABLE "shop_item" ADD COLUMN IF NOT EXISTS "highlight" boolean NOT NULL DEFAULT false`);
+    } catch (e) {
+      console.warn("Auto-migrate highlight column failed:", e);
+    }
   }
   return AppDataSource;
 };
