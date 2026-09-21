@@ -12,7 +12,7 @@ export class OrderItem {
   @Column({ name: "order_id", type: "uuid" })
   orderId!: string;
 
-  @ManyToOne("Order", (order: any) => order.items)
+  @ManyToOne(() => Order, (order: any) => order.items)
   @JoinColumn({ name: "order_id" })
   order!: Relation<OrderType>;
 

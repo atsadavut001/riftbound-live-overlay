@@ -40,7 +40,7 @@ export class Order {
   @Column({ type: "varchar", nullable: true })
   courier!: string;
 
-  @OneToMany("OrderItem", (item: any) => item.order)
+  @OneToMany(() => OrderItem, (item: any) => item.order)
   items!: Relation<OrderItemType[]>;
 
   @CreateDateColumn({ name: "created_at" })
