@@ -63,6 +63,7 @@ export default function AdminShopPage() {
   const [selectedType, setSelectedType] = useState<string[]>([]);
   const [selectedRarity, setSelectedRarity] = useState<string[]>([]);
   const [selectedColor, setSelectedColor] = useState<string[]>([]);
+  const [selectedPriceSort, setSelectedPriceSort] = useState<string>("None");
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -142,8 +143,17 @@ export default function AdminShopPage() {
     return match;
   });
 
-  const totalPages = Math.ceil(filteredItems.length / limit) || 1;
-  const paginatedItems = filteredItems.slice((page - 1) * limit, page * limit);
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (selectedPriceSort === "HighToLow") {
+      return Number(b.price) - Number(a.price);
+    } else if (selectedPriceSort === "LowToHigh") {
+      return Number(a.price) - Number(b.price);
+    }
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedItems.length / limit) || 1;
+  const paginatedItems = sortedItems.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -231,6 +241,22 @@ export default function AdminShopPage() {
               selected={selectedRarity} 
               onChange={(val) => { setSelectedRarity(val); setPage(1); }} 
             />
+            
+            <div className="relative flex-1 min-w-[120px]">
+              <div className="flex items-center gap-2 bg-[#111] border border-[#333] rounded-md px-3 py-1.5 cursor-pointer h-full">
+                <span className="text-xs text-gray-500 whitespace-nowrap">Price</span>
+                <select 
+                  value={selectedPriceSort} 
+                  onChange={e => { setSelectedPriceSort(e.target.value); setPage(1); }}
+                  className="bg-transparent text-sm text-gray-300 w-full outline-none appearance-none cursor-pointer"
+                >
+                  <option value="None" className="bg-[#1a1a1a]">None</option>
+                  <option value="HighToLow" className="bg-[#1a1a1a]">มากไปน้อย</option>
+                  <option value="LowToHigh" className="bg-[#1a1a1a]">น้อยไปมาก</option>
+                </select>
+                <svg className="w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -277,6 +303,9 @@ export default function AdminShopPage() {
                         <span className="bg-purple-900/40 text-purple-400 px-2 py-0.5 rounded border border-purple-800/50">{item.print || 'Normal'}</span>
                         <span>{item.card?.type}</span>
                         <span>{item.card?.rarity}</span>
+                        {item.highlight && (
+                          <span className="bg-yellow-900/40 text-yellow-400 px-2 py-0.5 rounded font-bold border border-yellow-800/50">Highlight</span>
+                        )}
                       </div>
                     </td>
                     <td className="p-4 font-bold text-xl text-[var(--primary)]">

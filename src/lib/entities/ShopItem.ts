@@ -23,6 +23,9 @@ export class ShopItem {
   @Column({ type: "varchar", default: "Normal" })
   print!: string;
 
+  @Column({ type: "boolean", default: false })
+  highlight!: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

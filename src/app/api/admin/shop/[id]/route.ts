@@ -29,7 +29,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     repo.merge(item, {
       price: body.price,
       quantity: body.quantity,
-      print: body.print
+      print: body.print,
+      highlight: body.highlight
     });
 
     await repo.save(item);

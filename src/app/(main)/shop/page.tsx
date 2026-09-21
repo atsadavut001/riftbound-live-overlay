@@ -66,6 +66,39 @@ export default function ShopPage() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   
+  const [highlightedCards, setHighlightedCards] = useState<any[]>([]);
+  const [showHighlights, setShowHighlights] = useState(true);
+  const [loadingHighlights, setLoadingHighlights] = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("zberus_shop_show_highlights");
+    if (saved !== null) {
+      setShowHighlights(saved === "true");
+    }
+  }, []);
+
+  const toggleHighlights = (val: boolean) => {
+    setShowHighlights(val);
+    localStorage.setItem("zberus_shop_show_highlights", String(val));
+  };
+
+  useEffect(() => {
+    const fetchHighlights = async () => {
+      try {
+        const res = await fetch(`/api/shop?highlight=true&limit=100`);
+        if (res.ok) {
+          const data = await res.json();
+          setHighlightedCards(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingHighlights(false);
+      }
+    };
+    fetchHighlights();
+  }, []);
+  
   const cardsPerPage = 48;
   const totalPages = Math.max(1, Math.ceil(totalCards / cardsPerPage));
 
@@ -206,6 +239,99 @@ export default function ShopPage() {
         <h1 className="text-3xl font-bold mb-1">Riftbound Zberus Shop</h1>
         <p className="text-gray-400">Find and purchase your favorite cards</p>
       </div>
+
+      {/* Highlights Section */}
+      {!loadingHighlights && highlightedCards.length > 0 && showHighlights && (
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              Highlighted Items
+            </h2>
+            <button 
+              onClick={() => toggleHighlights(false)}
+              className="text-sm text-gray-400 hover:text-white bg-[#1a1a1a] border border-[#333] px-3 py-1.5 rounded-md transition-colors"
+            >
+              ปิด Highlight
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {highlightedCards.map((item, index) => {
+              const card = item.card;
+              if (!card) return null;
+              return (
+                <div key={`hl-${index}`} className="bg-[#1a1a1a] rounded-xl border border-yellow-900/50 p-3 flex gap-4 h-full shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:border-yellow-500 transition-colors group relative overflow-hidden">
+                  {/* Left: Image */}
+                  <div 
+                    className="relative w-[110px] aspect-[2/3] rounded-md overflow-hidden bg-black flex-shrink-0 cursor-pointer z-10"
+                    onClick={() => setSelectedItem(item)}
+                  >
+                    {card.imageUrl ? (
+                      <img src={card.imageUrl} alt={card.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs">No img</div>
+                    )}
+                  </div>
+                  
+                  {/* Right: Details */}
+                  <div className="flex-1 flex flex-col justify-between py-1 min-w-0 z-10">
+                    <div className="w-full pr-4">
+                      <h3 
+                        className="font-bold text-white text-sm border-b-[2.5px] border-yellow-500 inline-block pb-0.5 mb-1 max-w-full truncate align-bottom cursor-pointer hover:text-yellow-400 transition-colors"
+                        onClick={() => setSelectedItem(item)}
+                      >
+                        {card.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="text-[11px] text-gray-400 font-medium">{card.code} {card.rarity || 'C'}</div>
+                        {item.print && item.print !== 'Normal' && (
+                          <span className="bg-purple-900/40 text-purple-400 text-[9px] px-1.5 py-0 rounded font-bold border border-purple-800/50 flex-shrink-0">
+                            {item.print}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex border border-[#333] rounded-lg overflow-hidden mt-3 h-[42px]">
+                      <div className="flex-1 px-1 py-1 text-center border-r border-[#333] bg-[#111]">
+                        <div className="text-[9px] text-gray-500">คงเหลือ</div>
+                        <div className="font-bold text-white text-xs leading-none mt-1">{item.quantity}</div>
+                      </div>
+                      <div className="flex-1 px-1 py-1 text-center border-r border-[#333] bg-[#111]">
+                        <div className="text-[9px] text-gray-500">เริ่มต้น</div>
+                        <div className="font-bold text-yellow-400 text-xs leading-none mt-1">฿{item.price}</div>
+                      </div>
+                      <div 
+                        className="w-10 flex items-center justify-center bg-[#222] cursor-pointer hover:bg-yellow-500 transition-colors group/btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(item);
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-gray-300 group-hover/btn:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!showHighlights && highlightedCards.length > 0 && (
+        <div className="mb-6 flex justify-end">
+          <button 
+            onClick={() => toggleHighlights(true)}
+            className="text-sm text-yellow-500 hover:text-yellow-400 flex items-center gap-1 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            แสดง Highlight
+          </button>
+        </div>
+      )}
 
       {/* Filters Area */}
       <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6 mb-8">

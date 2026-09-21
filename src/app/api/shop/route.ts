@@ -40,11 +40,30 @@ export async function GET(req: NextRequest) {
       qb = qb.andWhere("card.rarity IN (:...rarity)", { rarity: rarity.split(",") });
     }
 
+    const highlight = searchParams.get('highlight');
+    if (highlight === 'true') {
+      qb = qb.andWhere("shopItem.highlight = true");
+    }
+
     // Color is stored in detail jsonb... this is complex to query in TypeORM builder simply,
     // let's skip strict DB color filtering for now and just fetch and filter in memory if color is provided,
     // OR we just use basic pagination for the rest.
     
-    qb = qb.orderBy("shopItem.createdAt", "DESC");
+    // Custom sort order based on requested set sequence
+    qb = qb.addSelect(`
+      CASE 
+        WHEN card.code LIKE 'OGN-%' THEN 1
+        WHEN card.code LIKE 'SFD-%' THEN 2
+        WHEN card.code LIKE 'UNL-%' THEN 3
+        WHEN card.code LIKE 'VEN-%' THEN 4
+        WHEN card.code LIKE 'OGS-%' THEN 5
+        WHEN card.code LIKE 'ARC-%' THEN 6
+        ELSE 7
+      END
+    `, "sort_order");
+    
+    qb = qb.orderBy("sort_order", "ASC");
+    qb = qb.addOrderBy("card.code", "ASC");
 
     const [items, total] = await qb
       .skip((page - 1) * limit)

@@ -12,11 +12,13 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
     price: number | string;
     quantity: number | string;
     print: string;
+    highlight: boolean;
   }>({
     cardId: "",
     price: 0,
     quantity: 0,
-    print: "Normal"
+    print: "Normal",
+    highlight: false
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -66,7 +68,8 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
               cardId: data.cardId,
               price: data.price,
               quantity: data.quantity,
-              print: data.print || "Normal"
+              print: data.print || "Normal",
+              highlight: data.highlight || false
             });
             if (data.card) {
               setCards([data.card]);
@@ -197,12 +200,28 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
           <select 
             value={formData.print} 
             onChange={(e) => setFormData({...formData, print: e.target.value})}
-            className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)] text-white"
+            className="w-full bg-[#111] border border-[var(--border)] rounded px-3 py-2 outline-none focus:border-[var(--primary)] text-white mb-4"
           >
             <option value="Normal">Normal</option>
             <option value="Foil">Foil</option>
             <option value="Pomo">Pomo</option>
           </select>
+        </div>
+
+        <div className="flex items-center justify-between bg-[#111] border border-[var(--border)] rounded px-4 py-3 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-white">Highlight</label>
+            <p className="text-xs text-gray-400 mt-0.5">Show this item prominently in the shop</p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              className="sr-only peer"
+              checked={formData.highlight}
+              onChange={(e) => setFormData({...formData, highlight: e.target.checked})}
+            />
+            <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--primary)]"></div>
+          </label>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
