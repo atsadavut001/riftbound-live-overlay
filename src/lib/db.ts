@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import "pg";
-import { DataSource } from "typeorm";
+import { DataSource, ObjectLiteral } from "typeorm";
 import { User } from "./entities/User";
 import { OverlayState } from "./entities/OverlayState";
 import { Card } from "./entities/Card";
@@ -29,7 +29,7 @@ export const getDataSource = async () => {
   return AppDataSource;
 };
 
-export const getSafeRepository = async <T>(tableName: string) => {
+export const getSafeRepository = async <T extends ObjectLiteral>(tableName: string) => {
   const db = await getDataSource();
   const metadata = db.entityMetadatas.find(meta => meta.tableName === tableName);
   if (!metadata) throw new Error(`Entity metadata for table ${tableName} not found`);

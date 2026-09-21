@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { getDataSource, getSafeRepository } from "@/lib/db";
 import { Order } from "@/lib/entities/Order";
+import { ShopItem } from "@/lib/entities/ShopItem";
 
 export async function PUT(req: NextRequest) {
   try {
@@ -43,7 +44,6 @@ export async function PUT(req: NextRequest) {
       if (order.status !== "cancelled") {
         order.status = "cancelled";
         // Restore stock
-        const { ShopItem } = require("@/lib/entities/ShopItem");
         const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
         if (order.items) {
           for (const item of order.items) {
