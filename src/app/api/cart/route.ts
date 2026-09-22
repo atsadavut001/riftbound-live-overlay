@@ -24,15 +24,40 @@ export async function GET(req: NextRequest) {
       .getOne();
     if (order) {
       let currentSubtotal = 0;
+      let validItems = [];
+      let itemsToRemove: string[] = [];
+
       for (const item of order.items) {
-        if (item.shopItem) {
+        if (!item.shopItem || item.shopItem.quantity <= 0) {
+          itemsToRemove.push(item.id);
+        } else {
           const currentPrice = Number(item.shopItem.price) || 0;
-          currentSubtotal += currentPrice * item.quantity;
-          // Optionally update priceAtTime to reflect current price in cart
+          let quantityToKeep = item.quantity;
+          
+          // Optionally adjust quantity if it exceeds stock
+          if (quantityToKeep > item.shopItem.quantity) {
+            quantityToKeep = item.shopItem.quantity;
+            item.quantity = quantityToKeep;
+            
+            // update in DB
+            const orderItemRepo = db.getRepository(OrderItem);
+            await orderItemRepo.update(item.id, { quantity: quantityToKeep });
+          }
+
+          currentSubtotal += currentPrice * quantityToKeep;
           item.priceAtTime = currentPrice; 
+          validItems.push(item);
         }
       }
+
+      if (itemsToRemove.length > 0) {
+        const orderItemRepo = db.getRepository(OrderItem);
+        await orderItemRepo.delete(itemsToRemove);
+        order.items = validItems;
+      }
+      
       order.totalAmount = currentSubtotal;
+      await orderRepo.update(order.id, { totalAmount: currentSubtotal });
     }
     
     return NextResponse.json(order || { items: [], totalAmount: 0, shippingFee: 50 });
@@ -57,6 +82,7 @@ export async function POST(req: NextRequest) {
     
     const shopItem = await shopItemRepo.findOne({ where: { id: shopItemId } });
     if (!shopItem) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    if (shopItem.quantity <= 0) return NextResponse.json({ error: "Item is out of stock" }, { status: 400 });
     
     // Find active cart
     let order = await orderRepo.findOne({
@@ -82,9 +108,15 @@ export async function POST(req: NextRequest) {
     });
     
     if (orderItem) {
+      if (orderItem.quantity + quantity > shopItem.quantity) {
+        return NextResponse.json({ error: "Not enough stock" }, { status: 400 });
+      }
       orderItem.quantity += quantity;
       await orderItemRepo.update(orderItem.id, { quantity: orderItem.quantity });
     } else {
+      if (quantity > shopItem.quantity) {
+        return NextResponse.json({ error: "Not enough stock" }, { status: 400 });
+      }
       orderItem = orderItemRepo.create({
         orderId: order.id,
         shopItemId,

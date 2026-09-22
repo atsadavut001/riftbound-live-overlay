@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
     const repo = await getSafeRepository<ShopItem>("shop_item");
     
     let qb = repo.createQueryBuilder("shopItem")
-      .leftJoinAndSelect("shopItem.card", "card");
+      .leftJoinAndSelect("shopItem.card", "card")
+      .where("shopItem.quantity > 0");
 
     if (search) {
       qb = qb.andWhere("(card.name ILIKE :search OR card.code ILIKE :search OR shopItem.print ILIKE :search)", { search: `%${search}%` });
