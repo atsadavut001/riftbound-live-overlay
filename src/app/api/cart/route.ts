@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
         totalAmount: 0,
         shippingFee: 50
       });
-      await orderRepo.save(order);
+      const insertResult = await orderRepo.insert(order);
+      order.id = insertResult.identifiers[0].id;
       order.items = [];
     }
     
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     
     if (orderItem) {
       orderItem.quantity += quantity;
-      await orderItemRepo.save(orderItem);
+      await orderItemRepo.update(orderItem.id, { quantity: orderItem.quantity });
     } else {
       orderItem = orderItemRepo.create({
         orderId: order.id,
@@ -90,7 +91,8 @@ export async function POST(req: NextRequest) {
         quantity,
         priceAtTime: shopItem.price
       });
-      await orderItemRepo.save(orderItem);
+      const insertResult = await orderItemRepo.insert(orderItem);
+      orderItem.id = insertResult.identifiers[0].id;
     }
     
     // Recalculate total
@@ -134,7 +136,7 @@ export async function PUT(req: NextRequest) {
     }
     
     orderItem.quantity = quantity;
-    await orderItemRepo.save(orderItem);
+    await orderItemRepo.update(orderItem.id, { quantity: orderItem.quantity });
     
     const allItems = await orderItemRepo.find({ where: { orderId: orderItem.orderId } });
     const total = allItems.reduce((acc, item) => acc + (Number(item.priceAtTime) * item.quantity), 0);
@@ -169,7 +171,7 @@ export async function DELETE(req: NextRequest) {
     
     const orderId = orderItem.orderId;
     
-    await orderItemRepo.remove(orderItem);
+    await orderItemRepo.delete(orderItem.id);
     
     const allItems = await orderItemRepo.find({ where: { orderId: orderId } });
     const total = allItems.reduce((acc, item) => acc + (Number(item.priceAtTime) * item.quantity), 0);

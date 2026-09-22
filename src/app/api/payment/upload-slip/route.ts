@@ -100,8 +100,11 @@ export async function POST(req: NextRequest) {
       order.status = "verifying"; // Fallback if no slipok config
     }
 
-    await orderRepo.save(order);
-
+    await orderRepo.update(order.id, { 
+      slipUrl: order.slipUrl, 
+      status: order.status, 
+      transRef: order.transRef 
+    });
     return NextResponse.json({ success: true, slipUrl: publicUrl, status: order.status });
   } catch (error) {
     console.error("Slip upload error:", error);

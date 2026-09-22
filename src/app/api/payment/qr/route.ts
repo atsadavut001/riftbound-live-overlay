@@ -37,8 +37,9 @@ export async function POST(req: NextRequest) {
         // Deduct stock
         for (const item of orderWithItems.items) {
           if (item.shopItem) {
-            item.shopItem.quantity = Math.max(0, item.shopItem.quantity - item.quantity);
-            await shopItemRepo.save(item.shopItem);
+            await shopItemRepo.update(item.shopItem.id, { 
+              quantity: Math.max(0, item.shopItem.quantity - item.quantity) 
+            });
           }
         }
       }
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
         : `${process.env.S3_ENDPOINT}/${bucket}/${key}`;
 
       order.qrUrl = publicUrl;
-      await orderRepo.save(order);
+      await orderRepo.update(order.id, { qrUrl: order.qrUrl });
     }
 
     return NextResponse.json({ success: true, qrUrl: order.qrUrl, status: order.status });

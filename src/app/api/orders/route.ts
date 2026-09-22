@@ -29,16 +29,14 @@ export async function GET(req: NextRequest) {
     if (expiredOrders.length > 0) {
       const shopItemRepo = (await getSafeRepository<ShopItem>("shop_item"));
       for (const order of expiredOrders) {
-        order.status = "cancelled";
         if (order.items) {
           for (const item of order.items) {
             if (item.shopItem) {
-              item.shopItem.quantity += item.quantity;
-              await shopItemRepo.save(item.shopItem);
+              await shopItemRepo.update(item.shopItem.id, { quantity: item.shopItem.quantity + item.quantity });
             }
           }
         }
-        await orderRepo.save(order);
+        await orderRepo.update(order.id, { status: "cancelled" });
       }
     }
 
@@ -94,13 +92,12 @@ export async function PUT(req: NextRequest) {
     if (order.items) {
       for (const item of order.items) {
         if (item.shopItem) {
-          item.shopItem.quantity += item.quantity;
-          await shopItemRepo.save(item.shopItem);
+          await shopItemRepo.update(item.shopItem.id, { quantity: item.shopItem.quantity + item.quantity });
         }
       }
     }
 
-    await orderRepo.save(order);
+    await orderRepo.update(order.id, { status: "cancelled" });
 
     return NextResponse.json({ success: true, order });
   } catch (error) {
