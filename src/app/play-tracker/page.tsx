@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function PlayTrackerPage() {
+function PlayTrackerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -467,3 +467,11 @@ export default function PlayTrackerPage() {
     </div>
   );
 }
+export default function PlayTrackerPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-black text-white">Loading...</div>}>
+      <PlayTrackerContent />
+    </Suspense>
+  );
+}
+
