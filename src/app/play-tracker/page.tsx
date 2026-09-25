@@ -437,7 +437,7 @@ export default function PlayTrackerPage() {
                   <div className="absolute inset-0 rounded-full border-[5px] border-yellow-500 bg-gradient-to-br from-yellow-700 to-yellow-900 flex items-center justify-center shadow-[0_0_40px_rgba(234,179,8,0.5)]" style={{ backfaceVisibility: "hidden" }}>
                     <span className="font-black text-5xl text-yellow-100">หัว</span>
                   </div>
-                  <div className="absolute inset-0 rounded-full border-[5px] border-slate-400 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-[0_0_40px_rgba(148,163,184,0.5)]" style={{ backface: "hidden", transform: "rotateY(180deg)" }}>
+                  <div className="absolute inset-0 rounded-full border-[5px] border-slate-400 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-[0_0_40px_rgba(148,163,184,0.5)]" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
                     <span className="font-black text-5xl text-white">ก้อย</span>
                   </div>
                 </div>
