@@ -3,15 +3,15 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import DonateModal from "./DonateModal";
 
 export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const isAdminPanel = pathname?.startsWith("/admin");
-  const [showDonateModal, setShowDonateModal] = useState(false);
   const [showDecksDropdown, setShowDecksDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const [cartCount, setCartCount] = useState(0);
 
@@ -45,6 +45,9 @@ export default function Navbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDecksDropdown(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setShowMobileMenu(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -54,13 +57,63 @@ export default function Navbar() {
 
   return (
     <header className="border-b border-[var(--border)] bg-[var(--surface)]">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 relative">
         <div className="flex items-center gap-4">
-          <a href={pathname?.startsWith("/shop") ? "/shop" : "/"} className="text-xl font-bold text-[var(--primary)]">
-            {pathname?.startsWith("/shop") ? "Riftbound Zberus Shop" : "Riftbound Overlay"}
+          <a href={pathname?.startsWith("/shop") ? "/shop" : "/"} className="text-xl font-bold text-[var(--primary)] hidden md:block">
+            Zberus Rift Service
+          </a>
+          <a href="/" className="text-xl font-bold text-[var(--primary)] md:hidden">
+            Zberus Rift Service
           </a>
         </div>
-        <div className={`flex items-center gap-6 ${pathname?.startsWith("/shop") ? "hidden md:flex" : ""}`}>
+        
+        {/* Mobile menu button */}
+        {!pathname?.startsWith("/shop") && (
+          <div className="md:hidden flex items-center" ref={mobileMenuRef}>
+            <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="text-gray-300 hover:text-white p-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            
+            {showMobileMenu && (
+              <div className="absolute top-full right-4 mt-2 w-56 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-2 z-50">
+                {session?.user ? (
+                  <>
+                    <div className="px-4 py-2 flex items-center gap-2 border-b border-[#333] mb-2">
+                      {session.user.image && <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-600" />}
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="text-sm font-medium text-white truncate">{session.user.name}</span>
+                      </div>
+                    </div>
+                    {(session.user as any).isAdmin ? (
+                      <>
+                        <a href="/admin" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Admin Panel</a>
+                        <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
+                        <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
+                        <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
+                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
+                        <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
+                        <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
+                      </>
+                    ) : (
+                      <>
+                        <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
+                        <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
+                        <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
+                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
+                        <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
+                        <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <button onClick={() => { setShowMobileMenu(false); signIn("google"); }} className="w-full text-left block px-4 py-2 text-sm text-white hover:bg-[#222]">Log in</button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className={`hidden md:flex items-center gap-6`}>
           {pathname?.startsWith("/shop") ? (
             <a href="/" className="text-sm font-medium bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
               กลับสู่หน้าหลัก Overlay
@@ -90,24 +143,18 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+              <a href="/points-tracker" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Points Tracker</a>
               <a href="/about" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">About us</a>
             </>
           )}
           
           {session?.user ? (
-            <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               {!isAdminPanel && !pathname?.startsWith("/shop") && (
                 <>
                   <a href="/overlapanal" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
                     Overlay
                   </a>
-                  <button 
-                    onClick={() => setShowDonateModal(true)}
-                    className="flex items-center gap-1.5 text-sm font-bold bg-[#29abe0] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f87b2] transition-colors"
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.061-4.3-.037-.046-.045-.085-.045-.085-.236-.874.05-1.744.5-2.074 1.015-.745 2.207-.538 3.168 1.547 1.25-1.954 2.239-2.311 3.237-1.541.52.394.908 1.18.665 2.144-.047.173-1.035 2.304-1.035 2.304z"/></svg>
-                    Support
-                  </button>
                 </>
               )}
               <div className={`flex items-center gap-4 ${!isAdminPanel ? 'pl-4 border-l border-[var(--border)]' : ''}`}>
@@ -152,16 +199,8 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-4">
-              {!isAdminPanel && (
-                <button 
-                  onClick={() => setShowDonateModal(true)}
-                  className="flex items-center gap-1.5 text-sm font-bold bg-[#29abe0] text-white px-3 py-1.5 rounded-lg hover:bg-[#1f87b2] transition-colors"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.061-4.3-.037-.046-.045-.085-.045-.085-.236-.874.05-1.744.5-2.074 1.015-.745 2.207-.538 3.168 1.547 1.25-1.954 2.239-2.311 3.237-1.541.52.394.908 1.18.665 2.144-.047.173-1.035 2.304-1.035 2.304z"/></svg>
-                  Support
-                </button>
-              )}
+            <div className="hidden md:flex items-center gap-4">
+              {/* Support button removed */}
               <button 
                 onClick={() => signIn("google")}
                 className="text-sm font-medium bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors"
@@ -172,7 +211,6 @@ export default function Navbar() {
           )}
         </div>
       </nav>
-      {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
       
       {/* Mobile Bottom Navigation for Shop */}
       {pathname?.startsWith("/shop") && (

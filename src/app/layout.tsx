@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Riftbound Live Overlay",
-  description: "Live Overlay and Dashboard for Riftbound",
+  title: "Zberus Rift Service",
+  description: "Live Overlay, Points Tracker, and Services for Zberus Rift",
 };
 
 export default function RootLayout({
