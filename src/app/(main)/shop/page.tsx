@@ -558,20 +558,20 @@ export default function ShopPage() {
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedItem(null)}>
           <div 
-            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative"
+            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button 
-              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10 p-2"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white z-20 p-2 bg-black/50 rounded-full md:bg-transparent"
               onClick={() => setSelectedItem(null)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
             {/* Left: Card Image */}
-            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center border-r border-[#333]">
-              <div className={`relative w-full max-w-sm flex items-center justify-center overflow-hidden ${selectedItem.card.type === 'Battlefield' ? 'aspect-[3/2]' : 'aspect-[2/3]'}`}>
+            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center md:border-r md:border-b-0 border-b border-[#333]">
+              <div className={`relative w-full max-w-[250px] md:max-w-sm flex items-center justify-center overflow-hidden ${selectedItem.card.type === 'Battlefield' ? 'aspect-[3/2]' : 'aspect-[2/3]'}`}>
                 <img 
                   src={selectedItem.card.imageUrl} 
                   alt={selectedItem.card.code}
