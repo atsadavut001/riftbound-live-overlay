@@ -1,6 +1,20 @@
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Zberus Rift Service",
+  alternateName: "Zberus Rift",
+  description:
+    "ศูนย์รวมเครื่องมือสำหรับผู้เล่นเกมการ์ด Riftbound: ฐานข้อมูลการ์ด, Deck Builder, Live Overlay, Meta Report และร้านค้าการ์ด",
+  inLanguage: "th",
+};
+
 export default function Home() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-16 text-center max-w-7xl mx-auto w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="space-y-4 mb-16">
         <h1 className="text-4xl sm:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary)] to-blue-400">
           Zberus Rift Service
@@ -11,7 +25,24 @@ export default function Home() {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full mb-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full mb-20">
+
+        {/* Card 0: Meta Report */}
+        <div className="bg-[#1a1a1a] border border-[#333] hover:border-red-500 rounded-2xl p-8 flex flex-col text-left transition-all hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] hover:-translate-y-1">
+          <div className="w-14 h-14 bg-red-500/10 text-red-400 rounded-xl flex items-center justify-center mb-6">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-3 text-white">Meta Report</h2>
+          <p className="text-gray-400 flex-1 mb-8">
+            สรุปเมตาเกมจากผลทัวร์นาเมนต์จริง ดู Tier List, Play Rate และ Win Rate ของแต่ละ Legend ก่อนจัดเด็ค
+          </p>
+          <a 
+            href="/meta"
+            className="w-full text-center rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white px-6 py-3 font-semibold transition-all"
+          >
+            ดู Meta Report
+          </a>
+        </div>
         {/* Card 1: Points Tracker */}
         <div className="bg-[#1a1a1a] border border-[#333] hover:border-blue-500 rounded-2xl p-8 flex flex-col text-left transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
           <div className="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center mb-6">

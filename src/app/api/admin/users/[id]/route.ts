@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDataSource } from "@/lib/db";
 import { User } from "@/lib/entities/User";
+import { requireAdmin } from "@/lib/auth";
 
 export async function PUT(
   req: NextRequest,
@@ -8,6 +9,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const body = await req.json();
     
     const dataSource = await getDataSource();
@@ -36,6 +39,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
     const dataSource = await getDataSource();
     const userRepository = dataSource.getRepository(User);

@@ -19,7 +19,7 @@ export default function PointsTrackerSetupPage() {
     // Fetch Legend cards
     const fetchLegends = async () => {
       try {
-        const res = await fetch("/api/admin/cards?type=Legend&limit=100");
+        const res = await fetch("/api/cards?type=Legend&limit=100");
         if (res.ok) {
           const data = await res.json();
           setLegends(data.data || []);

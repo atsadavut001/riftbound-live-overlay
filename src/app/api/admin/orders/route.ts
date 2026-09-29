@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { requireAdmin } from "@/lib/auth";
 import { getDataSource, getSafeRepository } from "@/lib/db";
 import { Order } from "@/lib/entities/Order";
 import { ShopItem } from "@/lib/entities/ShopItem";
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user || !(session.user as any).isAdmin) {
+    const session = await requireAdmin();
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    }
 
     const body = await req.json();
     const { orderId, action, trackingNumber, courier } = body;

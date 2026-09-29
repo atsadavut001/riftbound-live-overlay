@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSafeRepository } from "@/lib/db";
 import { ShopItem } from "@/lib/entities/ShopItem";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const repo = await getSafeRepository<ShopItem>("shop_item");
     const items = await repo.find({ relations: { card: true }, order: { createdAt: "DESC" } });
     return NextResponse.json(items);
@@ -15,6 +19,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const repo = await getSafeRepository<ShopItem>("shop_item");
     const body = await req.json();
 

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDataSource } from "@/lib/db";
 import { Card } from "@/lib/entities/Card";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const db = await getDataSource();
     const repo = db.getRepository(Card);
     
@@ -20,6 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const db = await getDataSource();
     const repo = db.getRepository(Card);
     const body = await req.json();
@@ -51,6 +58,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const db = await getDataSource();
     const repo = db.getRepository(Card);
     

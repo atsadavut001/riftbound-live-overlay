@@ -1,8 +1,9 @@
 "use client";
 import CardModal from "@/components/CardModal";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { buildAtlasDeckCode } from "@/lib/riftatlas";
 
 // Utility to group identical cards
 const groupCards = (cards: any[]) => {
@@ -37,6 +38,29 @@ export default function DeckViewPage() {
         .finally(() => setIsLoading(false));
     }
   }, [params.id]);
+
+  // Build a Rift Atlas play URL (deck code) from the saved deck.
+  // NOTE: hooks must run before any early return, so this handles unloaded decks too.
+  const atlasPlayUrl = useMemo(() => {
+    if (!deck?.cards) return null;
+    try {
+      const countByCode = (cards: { code?: string }[] | undefined) => {
+        const m = new Map<string, number>();
+        (cards || []).forEach(c => {
+          if (c.code) m.set(c.code, (m.get(c.code) || 0) + 1);
+        });
+        return Array.from(m.entries()).map(([cardCode, count]) => ({ cardCode, count }));
+      };
+      const mainEntries = countByCode(deck.cards.mainDeck);
+      // Legend is not part of mainDeck in the builder structure — add it explicitly
+      if (deck.cards.legend?.code) mainEntries.push({ cardCode: deck.cards.legend.code, count: 1 });
+      const sideEntries = countByCode(deck.cards.sideboard);
+      const code = buildAtlasDeckCode(mainEntries, sideEntries);
+      return `https://play.riftatlas.com/?deckCode=${encodeURIComponent(code)}`;
+    } catch {
+      return null; // e.g. R/SP card numbers not supported by our v3 encoder
+    }
+  }, [deck]);
 
   if (isLoading) return <div className="p-12 text-center text-gray-500">Loading...</div>;
   if (!deck) return <div className="p-12 text-center text-red-500">Deck not found</div>;
@@ -93,6 +117,17 @@ export default function DeckViewPage() {
             </div>
             
             <div className="flex gap-2">
+              {atlasPlayUrl && (
+                <a
+                  href={atlasPlayUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#1d3a5f] hover:bg-[#2a5285] text-white px-4 py-2 rounded font-medium transition-colors flex items-center gap-2"
+                  title="เปิดเด็คนี้ใน Rift Atlas Simulator"
+                >
+                  ▶ Play on Rift Atlas
+                </a>
+              )}
               
               {deck.userId === 'anonymous' && (
                 <button 

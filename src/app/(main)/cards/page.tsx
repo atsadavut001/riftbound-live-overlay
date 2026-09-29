@@ -187,7 +187,7 @@ export default function CardLibraryPage() {
         const rarityQuery = selectedRarity.length > 0 ? selectedRarity.join(",") : "";
         const colorQuery = selectedColor.length > 0 ? selectedColor.join(",") : "";
         
-        const res = await fetch(`/api/admin/cards?page=${currentPage}&limit=${cardsPerPage}&set=${setQuery}&type=${typeQuery}&rarity=${rarityQuery}&color=${colorQuery}&search=${encodeURIComponent(debouncedSearchTerm)}`);
+        const res = await fetch(`/api/cards?page=${currentPage}&limit=${cardsPerPage}&set=${setQuery}&type=${typeQuery}&rarity=${rarityQuery}&color=${colorQuery}&search=${encodeURIComponent(debouncedSearchTerm)}`);
         if (res.ok) {
           const data = await res.json();
           setCards(data.data);

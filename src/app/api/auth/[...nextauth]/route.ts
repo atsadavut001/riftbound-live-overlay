@@ -5,6 +5,11 @@ import { User } from "@/lib/entities/User";
 
 import { NextAuthOptions } from "next-auth";
 
+interface SessionUser {
+  id?: string;
+  isAdmin?: boolean;
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -33,6 +38,32 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
+    async jwt({ token, user }) {
+      // Enrich the JWT with id/isAdmin at sign-in so middleware/proxy can read it.
+      try {
+        const email = user?.email || token.email;
+        if (email) {
+          const db = await getDataSource();
+          const userRepo = db.getRepository(User);
+          let dbUser = await userRepo.findOne({ where: { email } });
+
+          if (!dbUser) {
+            dbUser = userRepo.create({
+              email,
+              name: user?.name || (token.name as string) || "Unknown",
+              image: user?.image || (token.picture as string) || "",
+            });
+            await userRepo.save(dbUser);
+          }
+
+          token.id = dbUser.id;
+          token.isAdmin = dbUser.isAdmin;
+        }
+      } catch (e) {
+        console.error("JWT error:", e);
+      }
+      return token;
+    },
     async session({ session }) {
       try {
         if (session?.user?.email) {
@@ -49,8 +80,9 @@ export const authOptions: NextAuthOptions = {
             await userRepo.save(dbUser);
           }
           
-          (session.user as any).id = dbUser.id;
-          (session.user as any).isAdmin = dbUser.isAdmin;
+          const sessionUser = session.user as SessionUser;
+          sessionUser.id = dbUser.id;
+          sessionUser.isAdmin = dbUser.isAdmin;
         }
       } catch (e) {
         console.error("Session error:", e);

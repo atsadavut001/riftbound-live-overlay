@@ -90,6 +90,7 @@ export default function Navbar() {
                         <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
                         <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
                         <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
+                        <a href="/meta" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Meta Report</a>
                         <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
                         <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
@@ -99,6 +100,7 @@ export default function Navbar() {
                         <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
                         <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
                         <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
+                        <a href="/meta" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Meta Report</a>
                         <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
                         <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
@@ -144,6 +146,7 @@ export default function Navbar() {
                 )}
               </div>
               <a href="/points-tracker" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Points Tracker</a>
+              <a href="/meta" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Meta Report</a>
               <a href="/about" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">About us</a>
             </>
           )}

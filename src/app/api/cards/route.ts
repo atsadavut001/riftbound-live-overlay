@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDataSource } from "@/lib/db";
 import { Card } from "@/lib/entities/Card";
 import { Brackets } from "typeorm";
-import { requireAdmin } from "@/lib/auth";
+
+// Public, read-only card catalog API for user-facing pages
+// (Card Library, Deck Builder, Points Tracker, Overlay Analyzer).
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await requireAdmin();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -82,7 +81,7 @@ export async function GET(req: NextRequest) {
         ELSE 7
       END
     `, "ASC");
-    
+
     qb.addOrderBy("card.code", "ASC");
     qb.skip(skip).take(limit);
 
@@ -98,35 +97,5 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const session = await requireAdmin();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const db = await getDataSource();
-    const repo = db.getRepository(Card);
-    const body = await req.json();
-
-    const newCard = repo.create({
-      code: body.code,
-      name: body.name,
-      type: body.type,
-      rarity: body.rarity,
-      imageUrl: body.imageUrl,
-      refTcgThId: body.refTcgThId,
-      refTcgPlayerId: body.refTcgPlayerId,
-      detail: body.detail || {}
-    });
-
-    await repo.save(newCard);
-    return NextResponse.json(newCard);
-  } catch (error: any) {
-    if (error.code === '23505') { // unique violation
-      return NextResponse.json({ error: "Card code already exists" }, { status: 400 });
-    }
-    return NextResponse.json({ error: String(error), stack: error.stack }, { status: 500 });
   }
 }

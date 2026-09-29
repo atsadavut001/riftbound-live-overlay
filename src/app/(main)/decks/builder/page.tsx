@@ -114,9 +114,9 @@ function DeckBuilderContent() {
     setShowExportModal(true);
   };
 
-  const handleImport = async () => {
-    if (!importText.trim()) return;
-    const lines = importText.split('\n').map(l => l.trim()).filter(l => l);
+  const runImport = async (text: string, silent = false) => {
+    if (!text.trim()) return;
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
     const parsedData: Record<string, {name: string, count: number}[]> = {
       Legend: [], Champion: [], MainDeck: [], Battlefields: [], Runes: [], Sideboard: []
     };
@@ -187,11 +187,28 @@ function DeckBuilderContent() {
       setDeck(newDeck);
       setShowImportModal(false);
       setImportText("");
-      alert("Deck imported successfully!");
+      if (!silent) alert("Deck imported successfully!");
     } catch(e) {
-      alert("Failed to import deck.");
+      if (!silent) alert("Failed to import deck.");
+      else console.error("Auto-import failed:", e);
     }
   };
+
+  const handleImport = async () => {
+    if (!importText.trim()) return;
+    await runImport(importText);
+  };
+
+  // Auto-import when ?import=<decklist text> is passed (e.g. from Meta popular decks)
+  // Auto-import when ?import=<decklist text> is passed (e.g. from Meta popular decks).
+  // Runs once per page load; deliberately not reacting to decklistParam changes.
+  const decklistParam = searchParams.get("import");
+  const importedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!decklistParam || importedRef.current === decklistParam) return;
+    importedRef.current = decklistParam;
+    runImport(decodeURIComponent(decklistParam), true);
+  }, [decklistParam]);
 
 
   const libraryTabs = ["All", "Legend", "Main Deck", "Battlefields", "Runes"];
@@ -524,7 +541,7 @@ const handleAddCard = (card: any, isSideboard: boolean = false) => {
         }
         
         const rarityQuery = selectedRarity.length > 0 ? selectedRarity.join(",") : "";
-        const res = await fetch(`/api/admin/cards?page=${page}&limit=30&set=${setQuery}&type=${typeQuery}&color=${effectiveColorQuery}&rarity=${rarityQuery}&search=${encodeURIComponent(debouncedSearchTerm)}`);
+        const res = await fetch(`/api/cards?page=${page}&limit=30&set=${setQuery}&type=${typeQuery}&color=${effectiveColorQuery}&rarity=${rarityQuery}&search=${encodeURIComponent(debouncedSearchTerm)}`);
         if (res.ok) {
           const data = await res.json();
           if (page === 1) {

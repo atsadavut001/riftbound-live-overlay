@@ -51,7 +51,7 @@ export default function DashboardPage() {
     }
     const fetchChamps = async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Unit&search=${encodeURIComponent(legendBase1)}`);
+        const res = await fetch(`/api/cards?limit=100&type=Unit&search=${encodeURIComponent(legendBase1)}`);
         if (res.ok) {
           const data = await res.json();
           setChampionResults1((data.data || []).filter((c: any) => c.name.toLowerCase().includes(legendBase1.toLowerCase())));
@@ -68,7 +68,7 @@ export default function DashboardPage() {
     }
     const fetchChamps = async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Unit&search=${encodeURIComponent(legendBase2)}`);
+        const res = await fetch(`/api/cards?limit=100&type=Unit&search=${encodeURIComponent(legendBase2)}`);
         if (res.ok) {
           const data = await res.json();
           setChampionResults2((data.data || []).filter((c: any) => c.name.toLowerCase().includes(legendBase2.toLowerCase())));
@@ -81,7 +81,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Legend&search=${encodeURIComponent(legendSearch1.trim())}`);
+        const res = await fetch(`/api/cards?limit=100&type=Legend&search=${encodeURIComponent(legendSearch1.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setLegendResults1(data.data || []);
@@ -94,7 +94,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Legend&search=${encodeURIComponent(legendSearch2.trim())}`);
+        const res = await fetch(`/api/cards?limit=100&type=Legend&search=${encodeURIComponent(legendSearch2.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setLegendResults2(data.data || []);
@@ -107,7 +107,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Battlefield&search=${encodeURIComponent(battlefieldSearch1.trim())}`);
+        const res = await fetch(`/api/cards?limit=100&type=Battlefield&search=${encodeURIComponent(battlefieldSearch1.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setBattlefieldResults1(data.data || []);
@@ -120,7 +120,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=100&type=Battlefield&search=${encodeURIComponent(battlefieldSearch2.trim())}`);
+        const res = await fetch(`/api/cards?limit=100&type=Battlefield&search=${encodeURIComponent(battlefieldSearch2.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setBattlefieldResults2(data.data || []);
@@ -133,7 +133,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/cards?limit=10&search=${encodeURIComponent(cardSearch.trim())}`);
+        const res = await fetch(`/api/cards?limit=10&search=${encodeURIComponent(cardSearch.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setCardSearchResults(data.data || []);
@@ -157,7 +157,7 @@ export default function DashboardPage() {
       });
 
       const promises = Array.from(namesToFetch).map(async (name) => {
-        const res = await fetch(`/api/admin/cards?limit=1&search=${encodeURIComponent(name)}`);
+        const res = await fetch(`/api/cards?limit=1&search=${encodeURIComponent(name)}`);
         if (res.ok) {
           const data = await res.json();
           return data.data?.[0];

@@ -85,7 +85,7 @@ export default function AdminUserPage() {
         <input
           type="text"
           placeholder="Search by name or email..."
-          className="flex-1 max-w-sm px-4 py-2 bg-[var(--background-lighter)] border border-gray-700 rounded-lg text-white"
+          className="flex-1 max-w-sm px-4 py-2 bg-[#111] border border-[var(--border)] rounded-lg text-white outline-none focus:border-[var(--primary)]"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && fetchUsers()}
@@ -98,7 +98,7 @@ export default function AdminUserPage() {
         </button>
       </div>
 
-      <div className="bg-[var(--background-lighter)] rounded-xl border border-gray-800 overflow-hidden">
+      <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-400">Loading users...</div>
         ) : (
@@ -172,14 +172,14 @@ export default function AdminUserPage() {
       {/* Edit Modal */}
       {editingUser && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--background-lighter)] rounded-xl border border-gray-700 w-full max-w-md p-6">
+          <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] w-full max-w-md p-6 shadow-2xl">
             <h2 className="text-xl font-bold mb-4 text-white">Edit User</h2>
             <form onSubmit={handleUpdate} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 bg-[var(--background)] border border-gray-700 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-[#111] border border-[var(--border)] rounded-lg text-white outline-none focus:border-[var(--primary)]"
                   value={editingUser.name || ""}
                   onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
                 />
@@ -189,7 +189,7 @@ export default function AdminUserPage() {
                 <input
                   type="email"
                   disabled
-                  className="w-full px-3 py-2 bg-[var(--background)] border border-gray-700 rounded-lg text-gray-500 cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-[#111] border border-[var(--border)] rounded-lg text-gray-500 cursor-not-allowed"
                   value={editingUser.email}
                 />
               </div>
@@ -197,7 +197,7 @@ export default function AdminUserPage() {
                 <input
                   type="checkbox"
                   id="isAdmin"
-                  className="w-4 h-4 rounded border-gray-700 bg-[var(--background)]"
+                  className="w-4 h-4 rounded border-gray-700 bg-[#111] accent-[var(--primary)]"
                   checked={editingUser.isAdmin}
                   onChange={(e) => setEditingUser({ ...editingUser, isAdmin: e.target.checked })}
                 />

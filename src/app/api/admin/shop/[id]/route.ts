@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSafeRepository } from "@/lib/db";
 import { ShopItem } from "@/lib/entities/ShopItem";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const repo = await getSafeRepository<ShopItem>("shop_item");
     const item = await repo.findOne({ where: { id }, relations: { card: true } });
     if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -17,6 +21,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const repo = await getSafeRepository<ShopItem>("shop_item");
     const body = await req.json();
 
@@ -41,6 +48,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const repo = await getSafeRepository<ShopItem>("shop_item");
     const result = await repo.delete(id);
     if (result.affected === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDataSource } from "@/lib/db";
 import { CardTypeTemplate } from "@/lib/entities/CardTypeTemplate";
+import { requireAdmin } from "@/lib/auth";
 
 const DEFAULT_TYPES = [
   { name: "Legend", defaultJson: { cost: 0, power: 0, health: 0 } },
@@ -11,8 +12,11 @@ const DEFAULT_TYPES = [
   { name: "Rune", defaultJson: { element: "", effect: "" } },
 ];
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const db = await getDataSource();
     const repo = db.getRepository(CardTypeTemplate);
 
@@ -42,6 +46,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const db = await getDataSource();
     const repo = db.getRepository(CardTypeTemplate);
     const body = await req.json();

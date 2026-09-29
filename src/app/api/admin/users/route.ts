@@ -2,15 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDataSource } from "@/lib/db";
 import { User } from "@/lib/entities/User";
 import { ILike } from "typeorm";
-import { getServerSession } from "next-auth/next";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession();
-    // In a real app, check if session.user is admin.
-    // if (!session || !session.user || !session.user.isAdmin) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
+    const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const searchParams = req.nextUrl.searchParams;
     const search = searchParams.get("search") || "";

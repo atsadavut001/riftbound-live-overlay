@@ -10,15 +10,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
 
+  const isAdmin = !!(session?.user as any)?.isAdmin;
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
-    } else if (status === "authenticated" && !(session?.user as any)?.isAdmin) {
+    } else if (status === "authenticated" && !isAdmin) {
       router.push("/overlapanal");
     }
-  }, [status, session, router]);
+  }, [status, isAdmin, router]);
 
-  if (status === "loading" || !session) {
+  // Block rendering the admin UI until we have verified admin rights.
+  // (Server-side proxy.ts already guards this route; this is defense in depth.)
+  if (status === "loading" || !session || !isAdmin) {
     return <div className="p-8 text-center text-gray-400 flex-1">Loading admin panel...</div>;
   }
 
@@ -28,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Order", path: "/admin/order" },
     { name: "User", path: "/admin/user" },
     { name: "Issue", path: "/admin/issue" },
+    { name: "Meta Sync", path: "/admin/meta" },
   ];
 
   return (
@@ -41,12 +46,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {menuItems.map((item) => {
             const isActive = pathname?.startsWith(item.path) || (item.path === '/admin/card' && pathname === '/admin');
             return (
-              <Link 
-                key={item.path} 
+              <Link
+                key={item.path}
                 href={item.path}
                 className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActive 
-                    ? "bg-[var(--primary)] text-white shadow-md" 
+                  isActive
+                    ? "bg-[var(--primary)] text-white shadow-md"
                     : "text-gray-400 hover:text-white hover:bg-[#222]"
                 }`}
               >
