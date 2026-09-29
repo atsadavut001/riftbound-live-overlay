@@ -158,6 +158,18 @@ export default function CardLibraryPage() {
   const [selectedColor, setSelectedColor] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  // Deep-link support: /cards?card=OGN-042 (used in sitemap.xml) opens that card's modal
+  useEffect(() => {
+    const cardParam = new URLSearchParams(window.location.search).get("card");
+    if (!cardParam) return;
+    fetch(`/api/cards?limit=1&search=${encodeURIComponent(cardParam)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.data?.[0]) setSelectedCard(data.data[0]);
+      })
+      .catch(err => console.error("Failed to load linked card", err));
+  }, []);
   
   const cardsPerPage = 48;
   const totalPages = Math.max(1, Math.ceil(totalCards / cardsPerPage));
