@@ -25,8 +25,6 @@ export async function GET(req: NextRequest) {
     
     if (set) {
       const sets = set.split(",");
-      qb = qb.andWhere("card.code SUBSTRING(1, 3) IN (:...sets)", { sets }); // Not exactly correct in standard SQL but let's approximate or just use LIKE
-      // Actually, since code starts with set:
       const setConditions = sets.map((s, i) => `card.code LIKE :set${i}`).join(" OR ");
       const setParams = sets.reduce((acc: any, s, i) => ({ ...acc, [`set${i}`]: `${s}-%` }), {});
       qb = qb.andWhere(`(${setConditions})`, setParams);
@@ -37,7 +35,26 @@ export async function GET(req: NextRequest) {
     }
 
     if (rarity) {
-      qb = qb.andWhere("card.rarity IN (:...rarity)", { rarity: rarity.split(",") });
+      const rarities = rarity.split(",");
+      // "Promo" ไม่ใช่ค่า rarity จริงใน database — แปลงเป็นการกรองจากรหัส set โปรโมชันแทน
+      const PROMO_SETS = ["JDG", "OPP", "PR", "T1A", "T1S", "SGN"];
+      const realRarities = rarities.filter((r) => r !== "Promo");
+      const wantsPromo = rarities.includes("Promo");
+      const conditions: string[] = [];
+      const params: Record<string, unknown> = {};
+      if (realRarities.length > 0) {
+        conditions.push("card.rarity IN (:...realRarities)");
+        params.realRarities = realRarities;
+      }
+      if (wantsPromo) {
+        PROMO_SETS.forEach((s, i) => {
+          conditions.push(`card.code LIKE :promoSet${i}`);
+          params[`promoSet${i}`] = `${s}-%`;
+        });
+      }
+      if (conditions.length > 0) {
+        qb = qb.andWhere(`(${conditions.join(" OR ")})`, params);
+      }
     }
 
     const highlight = searchParams.get('highlight');

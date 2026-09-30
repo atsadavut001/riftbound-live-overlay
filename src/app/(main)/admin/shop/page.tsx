@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { SET_OPTIONS } from "@/lib/sets";
+import { RARITY_OPTIONS } from "@/lib/rarity";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -205,14 +207,7 @@ export default function AdminShopPage() {
           <div className="flex flex-wrap gap-4 flex-1">
             <MultiSelect 
               label="Set" 
-              options={[
-                {label: "Origins [OGN]", value: "OGN"},
-                {label: "Spiritforged [SFD]", value: "SFD"},
-                {label: "Unleashed [UNL]", value: "UNL"},
-                {label: "Vendetta [VEN]", value: "VEN"},
-                {label: "Proving Grounds [OGS]", value: "OGS"},
-                {label: "Arcane Box Set [ARC]", value: "ARC"}
-              ]} 
+              options={SET_OPTIONS} 
               selected={selectedSet} 
               onChange={(val) => { setSelectedSet(val); setPage(1); }} 
             />
@@ -231,13 +226,7 @@ export default function AdminShopPage() {
             />
             <MultiSelect 
               label="Rarity" 
-              options={[
-                {label: "Common", value: "Common"},
-                {label: "Uncommon", value: "Uncommon"},
-                {label: "Rare", value: "Rare"},
-                {label: "Epic", value: "Epic"},
-                {label: "Showcase", value: "Showcase"}
-              ]} 
+              options={RARITY_OPTIONS} 
               selected={selectedRarity} 
               onChange={(val) => { setSelectedRarity(val); setPage(1); }} 
             />

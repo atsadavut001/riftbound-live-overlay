@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { SET_OPTIONS } from "@/lib/sets";
+import { RARITY_OPTIONS } from "@/lib/rarity";
 
 // Outside component: Custom MultiSelect
 const MultiSelect = ({ label, options, selected, onChange }: { label: string, options: {label: string, value: string}[], selected: string[], onChange: (v: string[]) => void }) => {
@@ -339,14 +341,7 @@ export default function CardLibraryPage() {
           <div className="flex flex-wrap gap-4 flex-1">
             <MultiSelect 
               label="Set" 
-              options={[
-                {label: "Origins [OGN]", value: "OGN"},
-                {label: "Spiritforged [SFD]", value: "SFD"},
-                {label: "Unleashed [UNL]", value: "UNL"},
-                {label: "Vendetta [VEN]", value: "VEN"},
-                {label: "Proving Grounds [OGS]", value: "OGS"},
-                {label: "Arcane Box Set [ARC]", value: "ARC"}
-              ]} 
+              options={SET_OPTIONS} 
               selected={selectedSet} 
               onChange={(v) => { setSelectedSet(v); setCurrentPage(1); }} 
             />
@@ -365,13 +360,7 @@ export default function CardLibraryPage() {
             />
             <MultiSelect 
               label="Rarity" 
-              options={[
-                {label: "Common", value: "Common"},
-                {label: "Uncommon", value: "Uncommon"},
-                {label: "Rare", value: "Rare"},
-                {label: "Epic", value: "Epic"},
-                {label: "Showcase", value: "Showcase"}
-              ]} 
+              options={RARITY_OPTIONS} 
               selected={selectedRarity} 
               onChange={(v) => { setSelectedRarity(v); setCurrentPage(1); }} 
             />

@@ -36,7 +36,27 @@ export async function GET(req: NextRequest) {
 
     const rarityFilter = searchParams.get("rarity");
     if (rarityFilter && rarityFilter !== "All" && rarityFilter !== "") {
-      qb.andWhere("card.rarity IN (:...rarities)", { rarities: rarityFilter.split(",") });
+      const rarities = rarityFilter.split(",");
+      // "Promo" ไม่ใช่ค่า rarity จริงใน database — แปลงเป็นการกรองจากรหัส set โปรโมชันแทน
+      const PROMO_SETS = ["JDG", "OPP", "PR", "T1A", "T1S", "SGN"];
+      const realRarities = rarities.filter((r) => r !== "Promo");
+      const wantsPromo = rarities.includes("Promo");
+      qb.andWhere(new Brackets(qb => {
+        let hasCondition = false;
+        if (realRarities.length > 0) {
+          qb.where("card.rarity IN (:...realRarities)", { realRarities });
+          hasCondition = true;
+        }
+        if (wantsPromo) {
+          PROMO_SETS.forEach((s, i) => {
+            const param = `promoSet${i}`;
+            if (!hasCondition && i === 0) qb.where(`card.code LIKE :${param}`, { [param]: `${s}-%` });
+            else qb.orWhere(`card.code LIKE :${param}`, { [param]: `${s}-%` });
+          });
+        } else if (!hasCondition) {
+          qb.where("1=0"); // ไม่มีเงื่อนไขที่ใช้ได้ — คืนผลลัพธ์ว่าง
+        }
+      }));
     }
 
     const colorFilter = searchParams.get("color");

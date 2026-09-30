@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cards:sync": "node scripts/sync-cards.mjs",
+    "cards:fetch": "node scripts/fetch-riftbound.mjs",
+    "cards:check": "node scripts/check-missing-cards.mjs",
+    "cards:preview": "node scripts/build-import-preview.mjs",
+    "cards:import": "node scripts/import-cards.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1136.0",
