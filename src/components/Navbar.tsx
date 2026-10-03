@@ -304,15 +304,19 @@ export default function Navbar() {
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] z-50 flex justify-around items-center h-16 px-2 pb-safe">
           {session?.user ? (
             <>
-              <a href="/shop" className={`flex flex-col items-center justify-center w-1/4 ${pathname === "/shop" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+              <a href="/" className={`flex flex-col items-center justify-center w-1/5 ${pathname === "/" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 <span className="text-[10px]">Home</span>
               </a>
-              <a href="/shop/orders" className={`flex flex-col items-center justify-center w-1/4 ${pathname?.startsWith("/shop/orders") ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+              <a href="/shop" className={`flex flex-col items-center justify-center w-1/5 ${pathname === "/shop" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                <span className="text-[10px]">Shop</span>
+              </a>
+              <a href="/shop/orders" className={`flex flex-col items-center justify-center w-1/5 ${pathname?.startsWith("/shop/orders") ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                 <span className="text-[10px]">ประวัติสั่งซื้อ</span>
               </a>
-              <a href="/shop/cart" className={`flex flex-col items-center justify-center w-1/4 relative ${pathname?.startsWith("/shop/cart") ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+              <a href="/shop/cart" className={`flex flex-col items-center justify-center w-1/5 relative ${pathname?.startsWith("/shop/cart") ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 <span className="text-[10px]">ตะกร้า</span>
                 {cartCount > 0 && (
@@ -321,16 +325,26 @@ export default function Navbar() {
                   </span>
                 )}
               </a>
-              <button onClick={() => signOut({ callbackUrl: "/shop" })} className="flex flex-col items-center justify-center text-red-400 hover:text-red-300 w-1/4">
+              <button onClick={() => signOut({ callbackUrl: "/shop" })} className="flex flex-col items-center justify-center text-red-400 hover:text-red-300 w-1/5">
                 <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 <span className="text-[10px]">Logout</span>
               </button>
             </>
           ) : (
-            <button onClick={() => signIn("google", { callbackUrl: "/shop" })} className="flex flex-col items-center justify-center text-gray-400 hover:text-[var(--primary)] w-full py-2">
-              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-              <span className="text-[10px]">Login</span>
-            </button>
+            <>
+              <a href="/" className={`flex flex-col items-center justify-center w-1/3 ${pathname === "/" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                <span className="text-[10px]">Home</span>
+              </a>
+              <a href="/shop" className={`flex flex-col items-center justify-center w-1/3 ${pathname === "/shop" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                <span className="text-[10px]">Shop</span>
+              </a>
+              <button onClick={() => signIn("google", { callbackUrl: "/shop" })} className="flex flex-col items-center justify-center w-1/3 text-gray-400 hover:text-[var(--primary)]">
+                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                <span className="text-[10px]">Login</span>
+              </button>
+            </>
           )}
         </div>
       )}
