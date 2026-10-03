@@ -54,7 +54,16 @@ export default function AboutPage() {
 
   return (
     <div className="flex-1 w-full max-w-4xl mx-auto p-8 sm:p-12">
-      <h1 className="text-3xl font-bold mb-10 text-center">เกี่ยวกับ Riftbound Live Overlay</h1>
+      <div className="mb-10">
+        <img
+          src="/logo-zberus-rift.png"
+          alt="Zberus Rift Service"
+          width={512}
+          height={512}
+          className="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto mb-4 drop-shadow-[0_0_20px_rgba(59,130,246,0.35)]"
+        />
+        <h1 className="text-3xl font-bold text-center">เกี่ยวกับ Riftbound Live Overlay</h1>
+      </div>
       
       <div className="space-y-8">
         {/* Section 1: About and How to use */}
@@ -107,6 +116,14 @@ export default function AboutPage() {
                 <li className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">🛒</span>
                   <span><strong>Card Shop & Order Management:</strong> ระบบสั่งซื้อการ์ดที่รองรับระบบชำระเงินอัตโนมัติด้วย PromptPay พร้อมตรวจสอบสลิปอัตโนมัติ และติดตามสถานะออเดอร์</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Points Tracker:</strong> เครื่องมือนับคะแนนและ XP สำหรับเล่นบนโต๊ะจริง พร้อมนาฬิกาจับเวลา ระบบทอยเหรียญ 3D และเลือก Legend ของแต่ละฝั่งได้</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">✓</span>
+                  <span><strong>Meta Report:</strong> สรุปเมตาจากผลทัวร์นาเมนต์จริง แสดง Tier List, Play Rate และ Win Rate ของแต่ละ Legend พร้อมเจาะลึกลิสต์เด็คที่ใช้จริงในแต่ละทัวร์นาเมนต์</span>
                 </li>
               </ul>
             </div>

@@ -16,6 +16,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="space-y-4 mb-16">
+        <img src="/logo-zberus-rift.png" alt="Zberus Rift Service" width={125} height={125} className="w-24 h-24 sm:w-28 sm:h-28 object-contain mx-auto drop-shadow-[0_0_25px_rgba(59,130,246,0.35)]" />
         <h1 className="text-4xl sm:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary)] to-blue-400">
           Zberus Rift Service
         </h1>

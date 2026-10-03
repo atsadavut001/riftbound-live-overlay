@@ -72,7 +72,7 @@ export default function RootLayout({
     <html lang="th" className="dark" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col pb-16 md:pb-0`}
       >
         {children}
       </body>

@@ -9,8 +9,15 @@ export default function Footer() {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] relative py-4 text-sm text-gray-400">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 flex items-center justify-between">
-        <div className="flex-1 text-center pr-20">
-          &copy; 2026 Zberus Rift Service
+        <div className="flex-1 flex items-center justify-center gap-2 pr-20">
+          <img
+            src="/logo-zberus-rift.png"
+            alt="Zberus Rift Service"
+            width={512}
+            height={512}
+            className="w-6 h-6 object-contain"
+          />
+          <span>&copy; 2026 Zberus Rift Service</span>
         </div>
         <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2">
           <button 

@@ -10,6 +10,10 @@ export default function Navbar() {
   const isAdminPanel = pathname?.startsWith("/admin");
   const [showDecksDropdown, setShowDecksDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const [showMobileProfile, setShowMobileProfile] = useState(false);
+  const mobileProfileRef = useRef<HTMLDivElement>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +49,12 @@ export default function Navbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDecksDropdown(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+      if (mobileProfileRef.current && !mobileProfileRef.current.contains(event.target as Node)) {
+        setShowMobileProfile(false);
+      }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setShowMobileMenu(false);
       }
@@ -59,11 +69,13 @@ export default function Navbar() {
     <header className="border-b border-[var(--border)] bg-[var(--surface)]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 relative">
         <div className="flex items-center gap-4">
-          <a href={pathname?.startsWith("/shop") ? "/shop" : "/"} className="text-xl font-bold text-[var(--primary)] hidden md:block">
-            Zberus Rift Service
+          <a href={pathname?.startsWith("/shop") ? "/shop" : "/"} className="flex items-center gap-2.5 group hidden md:flex">
+            <img src="/logo-zberus-rift.png" alt="Zberus Rift Service" width={125} height={125} className="w-9 h-9 object-contain transition-transform group-hover:scale-110" />
+            <span className="text-xl font-bold text-[var(--primary)]">Zberus Rift Service</span>
           </a>
-          <a href="/" className="text-xl font-bold text-[var(--primary)] md:hidden">
-            Zberus Rift Service
+          <a href="/" className="flex items-center gap-2 group md:hidden">
+            <img src="/logo-zberus-rift.png" alt="Zberus Rift Service" width={125} height={125} className="w-8 h-8 object-contain transition-transform group-hover:scale-110" />
+            <span className="text-lg font-bold text-[var(--primary)]">Zberus Rift Service</span>
           </a>
         </div>
         
@@ -89,20 +101,26 @@ export default function Navbar() {
                         <a href="/admin" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Admin Panel</a>
                         <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
                         <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
+                        <a href="/decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Decks Library</a>
+                        <a href="/decks/builder" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Deck Builder</a>
+                        <a href="/decks/my-decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>My Decks</a>
                         <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
                         <a href="/meta" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Meta Report</a>
-                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
+                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
                       </>
                     ) : (
                       <>
                         <a href="/shop" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Shop</a>
                         <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Card Library</a>
+                        <a href="/decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Decks Library</a>
+                        <a href="/decks/builder" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Deck Builder</a>
+                        <a href="/decks/my-decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>My Decks</a>
                         <a href="/points-tracker" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Points Tracker</a>
                         <a href="/meta" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Meta Report</a>
-                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <a href="/overlapanal" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>Overlay</a>
+                        <a href="/about" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowMobileMenu(false)}>About</a>
                         <button onClick={() => { setShowMobileMenu(false); signOut(); }} className="w-full text-left block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Log out</button>
                       </>
                     )}
@@ -117,37 +135,40 @@ export default function Navbar() {
 
         <div className={`hidden md:flex items-center gap-6`}>
           {pathname?.startsWith("/shop") ? (
-            <a href="/" className="text-sm font-medium bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
-              กลับสู่หน้าหลัก Overlay
+            <a href="/" className="text-sm font-medium bg-[#222] text-[#29abe0] px-4 py-2 rounded-lg hover:bg-[#2a2a2a] transition-colors">
+              กลับสู่หน้าหลักเว็บ Zberus Rift Service
             </a>
           ) : !isAdminPanel && (
             <>
-              <a href="/" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Home</a>
               <a href="/shop" target="_blank" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Shop</a>
-              <a href="/cards" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Card Library</a>
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowDecksDropdown(!showDecksDropdown)}
                   className="flex items-center gap-1 text-sm font-medium hover:text-[var(--primary)] transition-colors outline-none"
                 >
-                  Decks
+                  Cards & Decks
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {showDecksDropdown && (
-                  <div className="absolute top-full left-0 mt-2 w-40 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-1 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-44 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-1 z-50">
+                    <a href="/cards" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Card Library</a>
                     <a href="/decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Decks Library</a>
                     {session?.user && (
                       <>
-                        <a href="/decks/builder" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Builder</a>
+                        <a href="/decks/builder" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>Deck Builder</a>
                         <a href="/decks/my-decks" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white" onClick={() => setShowDecksDropdown(false)}>My Decks</a>
                       </>
                     )}
                   </div>
                 )}
               </div>
-              <a href="/points-tracker" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Points Tracker</a>
               <a href="/meta" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Meta Report</a>
-              <a href="/about" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">About us</a>
+              {!session?.user && (
+                <>
+                  <a href="/points-tracker" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">Points Tracker</a>
+                  <a href="/about" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">About us</a>
+                </>
+              )}
             </>
           )}
           
@@ -161,11 +182,6 @@ export default function Navbar() {
                 </>
               )}
               <div className={`flex items-center gap-4 ${!isAdminPanel ? 'pl-4 border-l border-[var(--border)]' : ''}`}>
-                {(session.user as any).isAdmin && !isAdminPanel && (
-                  <a href="/admin" className="text-sm font-medium text-[#f59e0b] hover:text-[#fbbf24] transition-colors">
-                    Admin Panel
-                  </a>
-                )}
                 {isAdminPanel && (
                   <a href="/" className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors pr-4 border-r border-[var(--border)]">
                     User Panel
@@ -187,19 +203,34 @@ export default function Navbar() {
                   </>
                 )}
 
-                <div className="flex items-center gap-2">
-                  {session.user.image && (
-                  <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-600" />
-                )}
-                <span className="text-sm font-medium hidden sm:inline-block">{session.user.name}</span>
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                    className="flex items-center gap-2 outline-none"
+                  >
+                    {session.user.image && (
+                      <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-600" />
+                    )}
+                    <span className="text-sm font-medium hidden sm:inline-block">{session.user.name}</span>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {showProfileDropdown && (
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-1 z-50">
+                      {!isAdminPanel && (
+                        <>
+                          <a href="/points-tracker" onClick={() => setShowProfileDropdown(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">Points Tracker</a>
+                          <a href="/about" onClick={() => setShowProfileDropdown(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">About us</a>
+                        </>
+                      )}
+                      {(session.user as any).isAdmin && !isAdminPanel && (
+                        <a href="/admin" onClick={() => setShowProfileDropdown(false)} className="block px-4 py-2 text-sm text-[#f59e0b] hover:bg-[#222] hover:text-[#fbbf24]">Admin Panel</a>
+                      )}
+                      <div className="my-1 border-t border-[#333]" />
+                      <button onClick={() => signOut()} className="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-[#222] hover:text-red-300">Log out</button>
+                    </div>
+                  )}
                 </div>
               </div>
-              <button 
-                onClick={() => signOut()}
-                className="text-sm text-red-400 hover:text-red-300 transition-colors ml-2"
-              >
-                Log out
-              </button>
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-4">
@@ -215,6 +246,59 @@ export default function Navbar() {
         </div>
       </nav>
       
+      {/* Mobile Bottom Navigation (global, except Shop which has its own) */}
+      {!pathname?.startsWith("/shop") && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] z-50 flex justify-around items-center h-16 px-2 pb-safe">
+          <a href="/points-tracker" className={`flex flex-col items-center justify-center w-1/5 ${pathname === "/points-tracker" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <span className="text-[10px]">Points</span>
+          </a>
+          <a href="/cards" className={`flex flex-col items-center justify-center w-1/5 ${pathname?.startsWith("/cards") ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            <span className="text-[10px]">Cards</span>
+          </a>
+          <a href="/" className={`flex flex-col items-center justify-center w-1/5 ${pathname === "/" ? "text-[var(--primary)]" : "text-gray-400 hover:text-[var(--primary)]"}`}>
+            <img src="/logo-zberus-rift.png" alt="Home" width={512} height={512} className="w-9 h-9 object-contain mb-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.4)]" />
+            <span className="text-[10px]">Home</span>
+          </a>
+          <a href="/shop" className="flex flex-col items-center justify-center w-1/5 text-gray-400 hover:text-[var(--primary)]">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            <span className="text-[10px]">Shop</span>
+          </a>
+          {session?.user ? (
+            <div className="relative w-1/5 flex justify-center" ref={mobileProfileRef}>
+              <button onClick={() => setShowMobileProfile(!showMobileProfile)} className="flex flex-col items-center justify-center w-full text-gray-400 hover:text-[var(--primary)]">
+                {session.user.image ? (
+                  <img src={session.user.image} alt="Profile" className="w-6 h-6 mb-1 rounded-full border border-gray-600" />
+                ) : (
+                  <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                )}
+                <span className="text-[10px]">Profile</span>
+              </button>
+              {showMobileProfile && (
+                <div className="absolute bottom-full right-0 mb-2 w-52 bg-[#1a1a1a] border border-[#333] rounded-md shadow-xl py-1 z-50">
+                  <div className="px-4 py-2 flex items-center gap-2 border-b border-[#333] mb-1">
+                    {session.user.image && <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-600" />}
+                    <span className="text-sm font-medium text-white truncate">{session.user.name}</span>
+                  </div>
+                  {(session.user as any).isAdmin && (
+                    <a href="/admin" onClick={() => setShowMobileProfile(false)} className="block px-4 py-2 text-sm text-[#f59e0b] hover:bg-[#222] hover:text-[#fbbf24]">Admin Panel</a>
+                  )}
+                  <a href="/about" onClick={() => setShowMobileProfile(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#222] hover:text-white">About us</a>
+                  <div className="my-1 border-t border-[#333]" />
+                  <button onClick={() => signOut()} className="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-[#222] hover:text-red-300">Log out</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button onClick={() => signIn("google")} className="flex flex-col items-center justify-center w-1/5 text-gray-400 hover:text-[var(--primary)]">
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+              <span className="text-[10px]">Login</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Mobile Bottom Navigation for Shop */}
       {pathname?.startsWith("/shop") && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] z-50 flex justify-around items-center h-16 px-2 pb-safe">
