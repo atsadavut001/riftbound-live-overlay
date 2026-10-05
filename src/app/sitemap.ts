@@ -3,7 +3,7 @@ import { getDataSource } from "@/lib/db";
 import { Card } from "@/lib/entities/Card";
 import { Deck } from "@/lib/entities/Deck";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://riftbound-live-overlay.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zberusrift.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [

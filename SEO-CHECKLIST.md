@@ -15,14 +15,14 @@
 
 | ชื่อ | ค่า | หมายเหตุ |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | `https://riftbound-live-overlay.vercel.app` | URL จริงของเว็บ ถ้ามีโดเมนเองให้ใช้โดเมนนั้นแทน |
+| `NEXT_PUBLIC_SITE_URL` | `https://zberusrift.vercel.app` | URL จริงของเว็บ ถ้ามีโดเมนเองให้ใช้โดเมนนั้นแทน |
 | `GOOGLE_SITE_VERIFICATION` | *(ใส่ทีหลัง จากขั้นตอนที่ 2)* | รหัสยืนยัน Search Console |
 
 3. กด **Save** → ไปที่แท็บ **Deployments** → กด **Redeploy** ที่ deployment ล่าสุด
    (ตัวแปรใหม่จะมีผลหลัง redeploy เท่านั้น)
 
 > หมายเหตุ: ถ้ายังไม่ใส่ `NEXT_PUBLIC_SITE_URL` ระบบจะ fallback ไปที่
-> `https://riftbound-live-overlay.vercel.app` ให้อัตโนมัติ — ถ้าโดเมนจริงต่างจากนี้ ต้องใส่เอง
+> `https://zberusrift.vercel.app` ให้อัตโนมัติ — ถ้าโดเมนจริงต่างจากนี้ ต้องใส่เอง
 
 ---
 
@@ -33,8 +33,8 @@ Search Console = ประตูบานให้ Google รู้จักเ�
 1. เข้า [search.google.com/search-console](https://search.google.com/search-console) ด้วยบัญชี Google
 2. กด **เพิ่มพร็อพเพอร์ตี (Add property)** — เลือกชนิด:
 
-   - **URL prefix** (`https://riftbound-live-overlay.vercel.app`) ← แนะนำสำหรับเริ่ม
-   - Domain (`riftbound-live-overlay.vercel.app`) ← ต้องมีโดเมนเอง + แก้ DNS ได้
+   - **URL prefix** (`https://zberusrift.vercel.app`) ← แนะนำสำหรับเริ่ม
+   - Domain (`zberusrift.vercel.app`) ← ต้องมีโดเมนเอง + แก้ DNS ได้
 
 3. **ยืนยันความเป็นเจ้าของ** — เลือกวิธี "HTML tag":
    - Google จะให้ meta tag มาประมาณ `<meta name="google-site-verification" content="xxx..." />`
@@ -75,7 +75,7 @@ Google ไม่ใช่เสิร์ชเอนจินเดียว —
 
 ## ขั้นตอนที่ 5 — ตรวจผลลัพธ์ + ตามต่อ (หลังผ่านไป 1–2 สัปดาห์)
 
-- **ทดสอบหน้าเว็บมองเห็นจาก Google จริงไหม**: ค้นหาใน Google ว่า `site:riftbound-live-overlay.vercel.app` — ขึ้นผล = index แล้ว
+- **ทดสอบหน้าเว็บมองเห็นจาก Google จริงไหม**: ค้นหาใน Google ว่า `site:zberusrift.vercel.app` — ขึ้นผล = index แล้ว
 - **Search Console → Performance**: ดูว่าคนค้นคำอะไรแล้วเจอเว็บเรา (Impressions/Clicks) — ใช้คำที่คนค้นเยอะแต่เราติดหน้า 2 เหล่านี้เป็น priority ปรับหัวข้อ/เนื้อหาต่อ
 - **Search Console → Coverage / Pages**: หน้าไหน "Discovered – not indexed" คือ Google ยังไม่รีบ index — ปกติ ถ้าเนื้อหาดีจะซึมเข้าเอง
 

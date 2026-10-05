@@ -12,7 +12,7 @@ const geistMono = Geist({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://riftbound-live-overlay.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zberusrift.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
