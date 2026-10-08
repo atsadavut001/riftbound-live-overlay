@@ -417,7 +417,7 @@ export default function CardLibraryPage() {
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-4 border-t border-[#333]">
         <div></div>
-        <div className="flex items-center gap-1 text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-1 text-sm max-w-full">
           <button 
             className="px-2 py-1 text-gray-400 hover:text-white disabled:opacity-50"
             onClick={() => setCurrentPage(1)}
@@ -427,7 +427,7 @@ export default function CardLibraryPage() {
             className="px-3 py-1 text-gray-400 hover:text-white disabled:opacity-50"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-          >&lt; Previous</button>
+          >&lt;<span className="hidden sm:inline"> Previous</span></button>
           
           {getPageNumbers().map((p, idx) => (
             p === '...' ? (
@@ -447,7 +447,7 @@ export default function CardLibraryPage() {
             className="px-3 py-1 text-gray-400 hover:text-white disabled:opacity-50"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || totalPages === 0}
-          >Next &gt;</button>
+          ><span className="hidden sm:inline">Next </span>&gt;</button>
           <button 
             className="px-2 py-1 text-gray-400 hover:text-white disabled:opacity-50"
             onClick={() => setCurrentPage(totalPages)}
@@ -456,7 +456,7 @@ export default function CardLibraryPage() {
         </div>
         
         <div className="flex items-center gap-2 text-sm text-gray-400">
-          Go to 
+          <span className="hidden sm:inline">Go to </span>
           <input 
             type="text" 
             className="w-12 bg-[#111] border border-[#333] rounded px-2 py-1 text-center outline-none focus:border-gray-500 text-white" 
@@ -477,19 +477,12 @@ export default function CardLibraryPage() {
       {selectedCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedCard(null)}>
           <div 
-            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative"
+            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl max-h-[calc(100dvh-2rem)] md:max-h-[92vh] flex flex-col md:flex-row overflow-y-auto overflow-x-hidden md:overflow-hidden shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button 
-              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10 p-2"
-              onClick={() => setSelectedCard(null)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
 
             {/* Left: Card Image */}
-            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center border-r border-[#333]">
+            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center md:border-r border-b md:border-b-0 border-[#333]">
               <div className={`relative w-full max-w-sm flex items-center justify-center overflow-hidden ${selectedCard.type === 'Battlefield' ? 'aspect-[3/2]' : 'aspect-[2/3]'}`}>
                 <img 
                   src={selectedCard.imageUrl} 
@@ -504,7 +497,7 @@ export default function CardLibraryPage() {
             </div>
 
             {/* Right: Card Details */}
-            <div className="w-full md:w-[55%] lg:w-[60%] p-8 overflow-y-auto max-h-[80vh]">
+            <div className="w-full md:w-[55%] lg:w-[60%] p-4 sm:p-8 md:overflow-y-auto md:max-h-[92vh]">
               <h2 className="text-3xl font-bold mb-4">{selectedCard.name}, {selectedCard.code}</h2>
               
               {/* Badges Row 1 */}
@@ -611,6 +604,14 @@ export default function CardLibraryPage() {
               <CardPriceSection card={selectedCard} />
             </div>
           </div>
+
+          {/* Close Button - pinned to overlay so it stays visible while the modal scrolls */}
+          <button 
+            className="absolute top-3 right-3 md:top-6 md:right-6 text-gray-400 hover:text-white z-20 p-2 rounded-full bg-black/60 md:bg-transparent"
+            onClick={() => setSelectedCard(null)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
       )}
     </div>

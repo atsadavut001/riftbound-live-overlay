@@ -1075,7 +1075,7 @@ const handleAddCard = (card: any, isSideboard: boolean = false) => {
       {previewCard && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-sm" onClick={() => setPreviewCard(null)}>
           <div 
-            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative"
+            className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-5xl max-h-[calc(100dvh-2rem)] md:max-h-[92vh] flex flex-col md:flex-row overflow-y-auto overflow-x-hidden md:overflow-hidden shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -1087,7 +1087,7 @@ const handleAddCard = (card: any, isSideboard: boolean = false) => {
             </button>
 
             {/* Left: Card Image */}
-            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center border-r border-[#333]">
+            <div className="w-full md:w-[45%] lg:w-[40%] bg-black p-6 flex items-center justify-center md:border-r border-b md:border-b-0 border-[#333]">
               <div className={`relative w-full max-w-sm flex items-center justify-center overflow-hidden ${previewCard.type === 'Battlefield' ? 'aspect-[3/2]' : 'aspect-[2/3]'}`}>
                 <img 
                   src={previewCard.imageUrl} 
@@ -1103,7 +1103,7 @@ const handleAddCard = (card: any, isSideboard: boolean = false) => {
 
             
             {/* Right: Card Details */}
-            <div className="w-full md:w-[55%] lg:w-[60%] p-8 overflow-y-auto max-h-[80vh]">
+            <div className="w-full md:w-[55%] lg:w-[60%] p-4 sm:p-8 md:overflow-y-auto md:max-h-[92vh]">
               <h2 className="text-3xl font-bold mb-4">{previewCard.name}, {previewCard.code}</h2>
               
               {/* Badges Row 1 */}
@@ -1210,6 +1210,14 @@ const handleAddCard = (card: any, isSideboard: boolean = false) => {
               )}
             </div>
           </div>
+
+          {/* Close Button - pinned to overlay so it stays visible while the modal scrolls */}
+          <button 
+            className="absolute top-3 right-3 md:top-6 md:right-6 text-gray-400 hover:text-white z-20 p-2 rounded-full bg-black/60 md:bg-transparent"
+            onClick={() => setPreviewCard(null)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
       )}
     </div>

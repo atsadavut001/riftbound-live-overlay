@@ -225,8 +225,8 @@ export default function AdminOrderPage() {
             </div>
             
             <div className="p-6 overflow-y-auto flex-1">
-              <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                <div><span className="text-gray-500 block mb-1">Order ID</span> <span className="font-mono text-gray-300">{selectedOrder.id}</span></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
+                <div><span className="text-gray-500 block mb-1">Order ID</span> <span className="font-mono text-gray-300 break-all">{selectedOrder.id}</span></div>
                 <div><span className="text-gray-500 block mb-1">วันที่สั่งซื้อ</span> <span className="text-gray-300">{new Date(selectedOrder.createdAt).toLocaleString('th-TH')}</span></div>
                 <div><span className="text-gray-500 block mb-1">ชื่อผู้ซื้อ</span> <span className="text-gray-300">{selectedOrder.user?.name}</span></div>
                 <div><span className="text-gray-500 block mb-1">สถานะปัจจุบัน</span> {getStatusDisplay(selectedOrder.status)}</div>
@@ -302,7 +302,7 @@ export default function AdminOrderPage() {
               )}
             </div>
             
-              <div className="p-4 bg-[#1a1a1a] border-t border-[#333] flex items-center gap-3">
+              <div className="p-4 bg-[#1a1a1a] border-t border-[#333] flex flex-wrap items-center gap-3">
                 {selectedOrder.status !== "shipped" && selectedOrder.status !== "cancelled" && (
                   <button onClick={() => handleAction(selectedOrder.id, "CANCEL")} disabled={updating} className="px-4 py-2 bg-red-900/40 hover:bg-red-500/80 text-red-100 text-sm font-bold rounded transition-colors mr-auto">
                     ยกเลิกออเดอร์
@@ -311,10 +311,10 @@ export default function AdminOrderPage() {
                 <div className="flex-1"></div>
                 {(selectedOrder.status === "verifying" || selectedOrder.status === "slipok_pass" || selectedOrder.status === "slipok_fail") && (
                   <>
-                    <button onClick={() => handleAction(selectedOrder.id, "REJECT_SLIP")} disabled={updating} className="px-4 py-2 bg-[#333] hover:bg-red-500/20 hover:text-red-500 text-white text-sm font-bold rounded transition-colors border border-transparent hover:border-red-500">
+                    <button onClick={() => handleAction(selectedOrder.id, "REJECT_SLIP")} disabled={updating} className="px-3 sm:px-4 py-2 bg-[#333] hover:bg-red-500/20 hover:text-red-500 text-white text-sm font-bold rounded transition-colors border border-transparent hover:border-red-500 min-w-0">
                       ปฏิเสธสลิป / ไม่ผ่าน
                     </button>
-                    <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors">
+                    <button onClick={() => handleAction(selectedOrder.id, "NEXT_STATUS")} disabled={updating} className="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors min-w-0">
                       ยืนยันการชำระเงิน
                     </button>
                   </>
