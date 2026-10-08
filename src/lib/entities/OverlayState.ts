@@ -44,6 +44,12 @@ export class OverlayState {
   @Column({ type: "varchar", default: "none" })
   layout!: string;
 
+  @Column({ type: "varchar", nullable: true })
+  backgroundUrl!: string | null;
+
+  @Column({ type: "jsonb", nullable: true })
+  banners!: { id: string; url: string; key: string }[] | null;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

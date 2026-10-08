@@ -63,6 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (body.timerPausedRemaining !== undefined) state.timerPausedRemaining = body.timerPausedRemaining;
     if (body.maxPoints !== undefined) state.maxPoints = body.maxPoints;
     if (body.layout !== undefined) state.layout = body.layout;
+    if (body.backgroundUrl !== undefined) state.backgroundUrl = body.backgroundUrl;
 
     await overlayRepo.save(state);
 

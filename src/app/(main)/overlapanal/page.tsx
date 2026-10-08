@@ -1,11 +1,16 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [overlayUrl, setOverlayUrl] = useState("");
+  const [uploadingBg, setUploadingBg] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const bgFileInputRef = useRef<HTMLInputElement>(null);
+  const bannerFileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_BANNERS = 5;
   const [state, setState] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [cardSetupTab, setCardSetupTab] = useState<'manual' | 'import'>('manual');
@@ -222,6 +227,86 @@ export default function DashboardPage() {
     }
   };
 
+  const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    setUploadingBg(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/overlay/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setState({ ...state, backgroundUrl: data.url });
+      } else {
+        alert(data.error || "อัปโหลดไม่สำเร็จ");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("อัปโหลดไม่สำเร็จ กรุณาลองอีกครั้ง");
+    } finally {
+      setUploadingBg(false);
+      if (bgFileInputRef.current) bgFileInputRef.current.value = "";
+    }
+  };
+
+  const handleBgRemove = async () => {
+    if (!userId) return;
+    try {
+      const res = await fetch("/api/overlay/upload", { method: "DELETE" });
+      if (res.ok) {
+        setState({ ...state, backgroundUrl: null });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    const currentCount = Array.isArray(state?.banners) ? state.banners.length : 0;
+    if (currentCount >= MAX_BANNERS) {
+      alert(`อัปโหลด banner ได้สูงสุด ${MAX_BANNERS} ไฟล์`);
+      if (bannerFileInputRef.current) bannerFileInputRef.current.value = "";
+      return;
+    }
+
+    setUploadingBanner(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/overlay/banners", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok && data.banners) {
+        setState({ ...state, banners: data.banners });
+      } else {
+        alert(data.error || "อัปโหลดไม่สำเร็จ");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("อัปโหลดไม่สำเร็จ กรุณาลองอีกครั้ง");
+    } finally {
+      setUploadingBanner(false);
+      if (bannerFileInputRef.current) bannerFileInputRef.current.value = "";
+    }
+  };
+
+  const handleBannerDelete = async (bannerId: string) => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`/api/overlay/banners?bannerId=${encodeURIComponent(bannerId)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok && data.banners) {
+        setState({ ...state, banners: data.banners });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const updatePoints = (player: 'a' | 'b', change: number) => {
     if (!state) return;
     const newPoints = { ...state.points };
@@ -304,6 +389,138 @@ export default function DashboardPage() {
                 <option value="cam">With Camera</option>
               </select>
             </div>
+          </div>
+
+          {/* Section: Background Upload */}
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
+            <h2 className="text-xl font-semibold mb-4">Overlay Background</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              อัปโหลดภาพพื้นหลังสำหรับ overlay ของคุณ (PNG, JPG, WEBP — แนะนำขนาด 1920×1080, ไม่เกิน 10MB)
+            </p>
+
+            {state?.backgroundUrl ? (
+              <div className="space-y-4">
+                {/* Preview */}
+                <div className="relative rounded-lg overflow-hidden border border-[var(--border)] bg-black aspect-video">
+                  <img
+                    src={state.backgroundUrl}
+                    alt="Overlay background preview"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => bgFileInputRef.current?.click()}
+                    disabled={uploadingBg}
+                    className="bg-[#222] hover:bg-[#333] border border-[var(--border)] text-white text-sm font-medium px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+                  >
+                    {uploadingBg ? "กำลังอัปโหลด..." : "เปลี่ยนรูป"}
+                  </button>
+                  <button
+                    onClick={handleBgRemove}
+                    disabled={uploadingBg}
+                    className="bg-red-600/20 hover:bg-red-600/30 border border-red-900/50 text-red-400 text-sm font-medium px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+                  >
+                    ลบรูป
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                onClick={() => !uploadingBg && bgFileInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (!uploadingBg && e.dataTransfer.files?.[0]) {
+                    const input = bgFileInputRef.current;
+                    if (input) {
+                      input.files = e.dataTransfer.files;
+                      handleBgUpload({ target: { files: e.dataTransfer.files } } as any);
+                    }
+                  }
+                }}
+                className={`border-2 border-dashed border-[var(--border)] rounded-lg p-10 text-center transition-colors ${
+                  uploadingBg ? "opacity-50 cursor-wait" : "cursor-pointer hover:border-[var(--primary)]"
+                }`}
+              >
+                {uploadingBg ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <svg className="animate-spin h-6 w-6 text-[var(--primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span className="text-sm text-gray-400">กำลังอัปโหลด...</span>
+                  </div>
+                ) : (
+                  <>
+                    <svg className="mx-auto h-10 w-10 text-gray-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                    <p className="text-sm text-gray-300 font-medium">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</p>
+                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP — ไม่เกิน 10MB</p>
+                  </>
+                )}
+              </div>
+            )}
+
+            <input
+              ref={bgFileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleBgUpload}
+            />
+          </div>
+
+          {/* Section: Banners */}
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Banners</h2>
+              <span className="text-xs text-gray-400">
+                {Array.isArray(state?.banners) ? state.banners.length : 0}/{MAX_BANNERS} ไฟล์ — หมุนเวียนใน overlay ทุก 10 วินาที
+              </span>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              อัปโหลดแบนเนอร์ (PNG, JPG, WEBP — ไม่เกิน 5MB/ไฟล์) จะแสดงด้านบนของ Countdown Timer ใน overlay และสลับหมุนเวียนทุก 10 วินาที
+            </p>
+
+            {Array.isArray(state?.banners) && state.banners.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                {state.banners.map((banner: { id: string; url: string }) => (
+                  <div key={banner.id} className="relative group rounded-lg overflow-hidden border border-[var(--border)] bg-black aspect-[5/1]">
+                    <img src={banner.url} alt="Banner" className="w-full h-full object-contain" />
+                    <button
+                      onClick={() => handleBannerDelete(banner.id)}
+                      disabled={uploadingBanner}
+                      className="absolute top-1 right-1 bg-black/70 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors disabled:opacity-50"
+                      title="ลบ banner"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => bannerFileInputRef.current?.click()}
+              disabled={uploadingBanner || (Array.isArray(state?.banners) ? state.banners.length : 0) >= MAX_BANNERS}
+              className="w-full border-2 border-dashed border-[var(--border)] rounded-lg py-6 text-center transition-colors hover:border-[var(--primary)] disabled:opacity-50 disabled:hover:border-[var(--border)] disabled:cursor-not-allowed"
+            >
+              {uploadingBanner ? (
+                <span className="flex flex-col items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-[var(--primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  <span className="text-sm text-gray-400">กำลังอัปโหลด...</span>
+                </span>
+              ) : (Array.isArray(state?.banners) ? state.banners.length : 0) >= MAX_BANNERS ? (
+                <span className="text-sm text-gray-500">ครบจำนวนสูงสุด {MAX_BANNERS} ไฟล์แล้ว — ลบไฟล์เดิมเพื่อเพิ่มไฟล์ใหม่</span>
+              ) : (
+                <span className="text-sm text-gray-300 font-medium">+ เพิ่ม Banner</span>
+              )}
+            </button>
+
+            <input
+              ref={bannerFileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleBannerUpload}
+            />
           </div>
 
           {/* Section: Match Settings */}

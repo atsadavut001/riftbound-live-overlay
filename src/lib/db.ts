@@ -35,6 +35,20 @@ export const getDataSource = async () => {
       console.warn("Auto-migrate highlight column failed:", e);
     }
 
+    // Overlay background image (user-uploaded)
+    try {
+      await AppDataSource.query(`ALTER TABLE "overlay_states" ADD COLUMN IF NOT EXISTS "backgroundUrl" varchar`);
+    } catch (e) {
+      console.warn("Auto-migrate overlay backgroundUrl column failed:", e);
+    }
+
+    // Overlay banners (user-uploaded, max 5, loops on overlay page)
+    try {
+      await AppDataSource.query(`ALTER TABLE "overlay_states" ADD COLUMN IF NOT EXISTS "banners" jsonb`);
+    } catch (e) {
+      console.warn("Auto-migrate overlay banners column failed:", e);
+    }
+
     // Meta Report tables (TopDeck.gg sync)
     try {
       await AppDataSource.query(`

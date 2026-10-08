@@ -47,6 +47,18 @@ function OverlayContent({ id }: { id: string }) {
 
   const [localShowCard, setLocalShowCard] = useState(false);
 
+  // Banner rotation: สลับรูปทุก 10 วินาที
+  const banners = Array.isArray(state?.banners) ? state.banners : [];
+  const [bannerIndex, setBannerIndex] = useState(0);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const interval = setInterval(() => {
+      setBannerIndex((i) => (i + 1) % banners.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
   useEffect(() => {
     setLocalShowCard(state?.cards?.cardVisible || false);
     if (state?.cards?.cardVisible && !state?.cards?.holdCard && state?.cards?.displaySeconds > 0) {
@@ -75,7 +87,8 @@ function OverlayContent({ id }: { id: string }) {
   const p2Points = state.points?.b || 0;
 
   const layout = state.layout || "none";
-  const bgImageUrl = layout === "cam" ? "https://qugqegaqjrcwkxnvohvv.supabase.co/storage/v1/object/public/ZberusTCG/layout_overlay/layout_cam.webp" : "https://qugqegaqjrcwkxnvohvv.supabase.co/storage/v1/object/public/ZberusTCG/layout_overlay/layout_none_cam.webp";
+  // ถ้า user อัปโหลดรูป overlay เอง ให้ใช้แทน layout มาตรฐานทันที (ตำแหน่ง/เลเยอร์เดียวกัน)
+  const bgImageUrl = state.backgroundUrl || (layout === "cam" ? "https://qugqegaqjrcwkxnvohvv.supabase.co/storage/v1/object/public/ZberusTCG/layout_overlay/layout_cam.webp" : "https://qugqegaqjrcwkxnvohvv.supabase.co/storage/v1/object/public/ZberusTCG/layout_overlay/layout_none_cam.webp");
 
   return (
     <div className={`w-screen h-screen fixed inset-0 overflow-hidden text-white font-sans`}>
@@ -145,7 +158,7 @@ function OverlayContent({ id }: { id: string }) {
         )}
       </div>
 
-      {/* Main Layout Background */}
+      {/* Main Layout Background (user-uploaded overlay แทนที่ layout มาตรฐาน) */}
       <img src={bgImageUrl} alt="Layout Background" className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none" />
 
       <div className="absolute top-4 left-0 w-full grid grid-cols-[1fr_auto_1fr] items-center px-8 gap-[4px] z-20">
@@ -271,6 +284,23 @@ function OverlayContent({ id }: { id: string }) {
             ))}
           </div>
         </>
+      )}
+
+      {/* Banner - ด้านบนของ Countdown Timer, กึ่งกลางแนวแกน X เดียวกับช่องชื่อ Player 1, หมุนเวียนทุก 10 วินาที + fade transition */}
+      <style>{`@keyframes bannerFadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
+      {banners.length > 0 && banners[bannerIndex] && (
+        <img
+          key={banners[bannerIndex].id}
+          src={banners[bannerIndex].url}
+          alt="Banner"
+          className="absolute w-[280px] h-[280px] object-contain z-20 pointer-events-none"
+          style={{
+            // กึ่งกลางแกน X ของช่องชื่อ P1 (เหมือน positioning ของชื่อผู้เล่น)
+            left: (layout === 'cam' ? 43 + 275 / 2 : 40 + 281 / 2) - 140,
+            bottom: 140,
+            animation: "bannerFadeIn 0.6s ease-in-out",
+          }}
+        />
       )}
 
       {/* Countdown Timer Area */}
