@@ -264,69 +264,55 @@ export default function AdminShopPage() {
             <p>ไม่พบสินค้าที่ค้นหา</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#1a1a1a] border-b border-[#333]">
-                  <th className="p-4 text-sm font-medium text-gray-400">Card Image</th>
-                  <th className="p-4 text-sm font-medium text-gray-400">Card Info</th>
-                  <th className="p-4 text-sm font-medium text-gray-400">Price (฿)</th>
-                  <th className="p-4 text-sm font-medium text-gray-400">Quantity</th>
-                  <th className="p-4 text-sm font-medium text-gray-400 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#222]">
-                {paginatedItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#1a1a1a] transition-colors group">
-                    <td className="p-4 w-24">
-                      {item.card?.imageUrl ? (
-                        <img src={item.card.imageUrl} alt="Card" className="w-12 h-16 object-contain rounded border border-[#333]" />
-                      ) : (
-                        <div className="w-12 h-16 bg-[#222] rounded border border-[#333] flex items-center justify-center text-xs text-gray-500">No Img</div>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <div className="font-bold text-lg mb-1">{item.card?.name || 'Unknown Card'}</div>
-                      <div className="flex gap-2 text-sm text-gray-400 mt-1">
-                        <span className="bg-[#222] px-2 py-0.5 rounded">{item.card?.code || 'N/A'}</span>
-                        <span className="bg-purple-900/40 text-purple-400 px-2 py-0.5 rounded border border-purple-800/50">{item.print || 'Normal'}</span>
-                        <span>{item.card?.type}</span>
-                        <span>{item.card?.rarity}</span>
-                        {item.highlight && (
-                          <span className="bg-yellow-900/40 text-yellow-400 px-2 py-0.5 rounded font-bold border border-yellow-800/50">Highlight</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4 font-bold text-xl text-[var(--primary)]">
-                      {item.price}
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded text-sm font-bold ${item.quantity > 0 ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}`}>
-                        {item.quantity} in stock
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2 transition-opacity">
-                        <button 
-                          onClick={() => router.push(`/admin/shop/${item.id}`)}
-                          className="p-2 text-blue-400 hover:bg-blue-400/10 rounded transition-colors"
-                          title="Edit"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(item.id)}
-                          className="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors"
-                          title="Delete"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {paginatedItems.map((item) => (
+              <div key={item.id} className="overflow-hidden rounded-xl border border-[#333] bg-[#111]">
+                <div className="relative aspect-[3/4] bg-[#1a1a1a]">
+                  {item.card?.imageUrl ? (
+                    <img src={item.card.imageUrl} alt={item.card?.name || "Card"} className="h-full w-full object-contain" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-gray-500">No Image</div>
+                  )}
+                  {item.highlight && (
+                    <span className="absolute left-2 top-2 rounded border border-yellow-800/50 bg-yellow-900/80 px-2 py-1 text-xs font-bold text-yellow-400">Highlight</span>
+                  )}
+                </div>
+                <div className="space-y-2 p-3">
+                  <div className="truncate font-medium text-white">{item.card?.name || "Unknown Card"}</div>
+                  <div className="flex items-center justify-between gap-2 text-xs text-gray-400">
+                    <span className="truncate">{item.card?.code || "N/A"}</span>
+                    <span className="shrink-0 rounded bg-purple-900/40 px-1.5 py-0.5 text-purple-400">{item.print || "Normal"}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 text-xs text-gray-400">
+                    <span className="truncate">{item.card?.type} · {item.card?.rarity}</span>
+                    <span className={`shrink-0 rounded px-1.5 py-0.5 font-bold ${item.quantity > 0 ? "bg-green-900/40 text-green-400" : "bg-red-900/40 text-red-400"}`}>
+                      {item.quantity} คงเหลือ
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-[#292929] pt-2">
+                    <span className="font-bold text-[var(--primary)]">฿{item.price}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => router.push(`/admin/shop/${item.id}`)}
+                        className="rounded p-2 text-blue-400 transition-colors hover:bg-blue-400/10"
+                        title="Edit"
+                        aria-label={`Edit ${item.card?.name || "shop item"}`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="rounded p-2 text-red-400 transition-colors hover:bg-red-400/10"
+                        title="Delete"
+                        aria-label={`Delete ${item.card?.name || "shop item"}`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

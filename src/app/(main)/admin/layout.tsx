@@ -29,6 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const menuItems = [
     { name: "Card", path: "/admin/card" },
     { name: "Shop", path: "/admin/shop" },
+    { name: "Shop Gem Image", path: "/admin/shop-gem-image" },
     { name: "Order", path: "/admin/order" },
     { name: "User", path: "/admin/user" },
     { name: "Issue", path: "/admin/issue" },
@@ -44,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <nav className="flex-1 flex flex-col gap-2 px-4 pb-6">
           {menuItems.map((item) => {
-            const isActive = pathname?.startsWith(item.path) || (item.path === '/admin/card' && pathname === '/admin');
+            const isActive = pathname === item.path || pathname?.startsWith(`${item.path}/`) || (item.path === '/admin/card' && pathname === '/admin');
             return (
               <Link
                 key={item.path}
