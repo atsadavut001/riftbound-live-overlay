@@ -3,7 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
+export default function ShopItemForm({
+  shopItemId,
+  initialCardId,
+  onSaved,
+  onCancel,
+}: {
+  shopItemId?: string;
+  initialCardId?: string;
+  onSaved?: () => void;
+  onCancel?: () => void;
+}) {
   const router = useRouter();
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCardObj, setSelectedCardObj] = useState<any>(null);
@@ -76,6 +86,15 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
               setSelectedCardObj(data.card);
             }
           }
+        } else if (initialCardId) {
+          const res = await fetch(`/api/admin/cards/${initialCardId}`);
+          const card = await res.json();
+          if (res.ok && card?.id) {
+            setFormData((current) => ({ ...current, cardId: card.id }));
+            setCards([card]);
+            setSelectedCardObj(card);
+            setSearchTerm(`${card.code} - ${card.name}`);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -84,7 +103,7 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
       }
     };
     init();
-  }, [shopItemId]);
+  }, [shopItemId, initialCardId]);
 
   const saveItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +124,8 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        router.push("/admin/shop");
+        if (onSaved) onSaved();
+        else router.push("/admin/shop");
       } else {
         alert("Error saving item");
       }
@@ -122,7 +142,7 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl max-w-2xl mx-auto flex flex-col">
       <div className="p-6 border-b border-[var(--border)] flex justify-between items-center">
         <h2 className="text-xl font-bold">{shopItemId ? "Edit Shop Item" : "Add Shop Item"}</h2>
-        <button onClick={() => router.push("/admin/shop")} className="text-gray-400 hover:text-white">✕</button>
+        <button onClick={() => (onCancel ? onCancel() : router.push("/admin/shop"))} className="text-gray-400 hover:text-white">✕</button>
       </div>
       
       <form onSubmit={saveItem} className="p-6 flex-1 space-y-6">
@@ -255,7 +275,7 @@ export default function ShopItemForm({ shopItemId }: { shopItemId?: string }) {
         </div>
 
         <div className="pt-6 border-t border-[var(--border)] flex justify-end gap-3">
-          <button type="button" onClick={() => router.push("/admin/shop")} className="px-4 py-2 rounded text-gray-300 hover:bg-gray-800 transition-colors">Cancel</button>
+          <button type="button" onClick={() => (onCancel ? onCancel() : router.push("/admin/shop"))} className="px-4 py-2 rounded text-gray-300 hover:bg-gray-800 transition-colors">Cancel</button>
           <button type="submit" disabled={loading} className="px-6 py-2 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-hover)] transition-colors disabled:opacity-50 font-medium">
             {loading ? "Saving..." : "Save Item"}
           </button>

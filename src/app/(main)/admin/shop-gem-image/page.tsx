@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SET_OPTIONS } from "@/lib/sets";
+import { RARITY_OPTIONS } from "@/lib/rarity";
 
 interface ShopItem {
   id: string;
@@ -12,17 +13,83 @@ interface ShopItem {
     name?: string;
     code?: string;
     type?: string;
+    rarity?: string;
     imageUrl?: string;
     detail?: { Color?: string[] | string };
   };
 }
 
+const TYPE_OPTIONS = [
+  { label: "Legend", value: "Legend" },
+  { label: "Battlefield", value: "Battlefield" },
+  { label: "Unit", value: "Unit" },
+  { label: "Gear", value: "Gear" },
+  { label: "Spell", value: "Spell" },
+  { label: "Rune", value: "Rune" },
+];
+
+const MultiSelect = ({ label, options, selected, onChange }: { label: string; options: { label: string; value: string }[]; selected: string[]; onChange: (v: string[]) => void }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative flex-1 min-w-[120px]" ref={ref}>
+      <div
+        className="flex items-center gap-2 bg-[#111] border border-[#333] rounded-md px-3 py-1.5 cursor-pointer"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="text-xs text-gray-500">{label}</span>
+        <div className="text-sm text-gray-300 flex-1 truncate">
+          {selected.length === 0 ? "All" : selected.map(v => options.find(o => o.value === v)?.label || v).join(", ")}
+        </div>
+        <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </div>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-full bg-[#1a1a1a] border border-[#333] rounded-md z-50 py-1 shadow-xl max-h-60 overflow-y-auto">
+          {options.map(opt => (
+            <label key={opt.value} className="flex items-center gap-2 px-3 py-1.5 hover:bg-[#222] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selected.includes(opt.value)}
+                onChange={(e) => {
+                  if (e.target.checked) onChange([...selected, opt.value]);
+                  else onChange(selected.filter(v => v !== opt.value));
+                }}
+                className="accent-[var(--primary)]"
+              />
+              <span className="text-sm text-gray-300">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const COLORS = ["Fury", "Calm", "Mind", "Order", "Chaos", "Body"] as const;
-const COLUMNS = 8;
-const CANVAS_WIDTH = 1920;
-const CARD_HEIGHT = 342;
+const COLUMNS = 12;
+const ROWS_PER_IMAGE = 5;
+const CARDS_PER_IMAGE = COLUMNS * ROWS_PER_IMAGE;
+const PREMIUM_RARITIES = ["rare", "epic", "showcase"];
+
+type ImageGroup = { title: string; fileKey: string; note: string; items: ShopItem[] };
+const CANVAS_WIDTH = 3840;
+const CARD_HEIGHT = 470;
 const GAP = 16;
 const PADDING = 32;
+const HEADER_HEIGHT = 112;
 
 function getCardColors(item: ShopItem): string[] {
   const colors = item.card?.detail?.Color;
@@ -124,6 +191,13 @@ export default function ShopGemImagePage() {
   const [generating, setGenerating] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState("");
 
+  const [search, setSearch] = useState("");
+  const [selectedSet, setSelectedSet] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
+  const [selectedRarity, setSelectedRarity] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string[]>([]);
+  const [selectedPriceSort, setSelectedPriceSort] = useState<string>("None");
+
   useEffect(() => {
     const loadItems = async () => {
       try {
@@ -145,25 +219,105 @@ export default function ShopGemImagePage() {
     loadItems();
   }, []);
 
+  const filteredItems = items.filter((item) => {
+    let match = true;
+
+    if (search) {
+      const s = search.toLowerCase();
+      const name = (item.card?.name || "").toLowerCase();
+      const code = (item.card?.code || "").toLowerCase();
+      const print = (item.print || "Normal").toLowerCase();
+      if (!name.includes(s) && !code.includes(s) && !print.includes(s)) match = false;
+    }
+
+    if (match && selectedSet.length > 0) {
+      const code = item.card?.code || "";
+      if (!selectedSet.some((set) => code.startsWith(`${set}-`))) match = false;
+    }
+
+    if (match && selectedType.length > 0) {
+      if (!selectedType.includes(item.card?.type || "")) match = false;
+    }
+
+    if (match && selectedRarity.length > 0) {
+      if (!selectedRarity.includes(item.card?.rarity || "")) match = false;
+    }
+
+    if (match && selectedColor.length > 0) {
+      const colors = getCardColors(item);
+      if (!selectedColor.some((color) => colors.includes(color.toLowerCase()))) match = false;
+    }
+
+    return match;
+  });
+
+  const sortedFilteredItems = [...filteredItems].sort((a, b) => {
+    if (selectedPriceSort === "HighToLow") return Number(b.price) - Number(a.price);
+    if (selectedPriceSort === "LowToHigh") return Number(a.price) - Number(b.price);
+    return 0;
+  });
+
   const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+  /* การ์ดที่ Quantity 0 ไม่ต้องใส่ในภาพ */
+  const inStockItems = selectedItems.filter((item) => Number(item.quantity ?? 0) > 0);
   const separateTypes = ["legend", "battlefield"] as const;
   const isSeparateType = (item: ShopItem) => separateTypes.includes((item.card?.type || "").toLowerCase() as typeof separateTypes[number]);
-  const itemsByColor: { color: string; items: ShopItem[] }[] = COLORS.map((color) => ({
-    color,
-    items: selectedItems.filter((item) => !isSeparateType(item) && getCardColors(item).includes(color.toLowerCase())).sort(sortBySetAndCode),
+
+  const getRarity = (item: ShopItem) => (item.card?.rarity || "").trim().toLowerCase();
+  const byPriceDesc = (a: ShopItem, b: ShopItem) => Number(b.price) - Number(a.price) || sortBySetAndCode(a, b);
+
+  /* Rare/Epic/Showcase เรียงราคาแพงก่อน, ที่เหลือ (Common/Uncommon) เรียงตาม Set และ Code — แบ่งภาพละไม่เกิน 60 ใบ */
+  const buildColorGroups = (colorItems: ShopItem[], colorLabel: string, keyPrefix: string): ImageGroup[] => {
+    const sections = [
+      {
+        items: colorItems.filter((item) => PREMIUM_RARITIES.includes(getRarity(item))).sort(byPriceDesc),
+        suffix: "rare-epic-showcase",
+        label: "RARE / EPIC / SHOWCASE",
+        note: "Rare/Epic/Showcase | เรียงตามราคาแพงสุดก่อน",
+      },
+      {
+        items: colorItems.filter((item) => !PREMIUM_RARITIES.includes(getRarity(item))).sort(sortBySetAndCode),
+        suffix: "common-uncommon",
+        label: "COMMON / UNCOMMON",
+        note: "Common/Uncommon | เรียงตาม Set และ Code",
+      },
+    ].filter((section) => section.items.length > 0);
+
+    return sections.flatMap((section) => {
+      const parts = Math.ceil(section.items.length / CARDS_PER_IMAGE);
+      return Array.from({ length: parts }, (_, partIndex) => ({
+        title: `${colorLabel.toUpperCase()} - ${section.label}${parts > 1 ? ` (${partIndex + 1}/${parts})` : ""}`,
+        fileKey: `${keyPrefix}-${section.suffix}${parts > 1 ? `-${partIndex + 1}` : ""}`,
+        note: section.note,
+        items: section.items.slice(partIndex * CARDS_PER_IMAGE, (partIndex + 1) * CARDS_PER_IMAGE),
+      }));
+    });
+  };
+
+  const colorGroups = COLORS.flatMap((color) =>
+    buildColorGroups(
+      inStockItems.filter((item) => !isSeparateType(item) && getCardColors(item).includes(color.toLowerCase())),
+      color,
+      color.toLowerCase(),
+    ),
+  );
+  const uncoloredItems = inStockItems.filter((item) => !isSeparateType(item) && getCardColors(item).length === 0);
+  const specialTypeGroups: ImageGroup[] = separateTypes.map((type) => ({
+    title: type === "legend" ? "LEGEND" : "BATTLEFIELD",
+    fileKey: type,
+    note: "12 columns | sorted by set and code",
+    items: inStockItems.filter((item) => (item.card?.type || "").toLowerCase() === type).sort(sortBySetAndCode),
   })).filter((group) => group.items.length > 0);
-  const uncoloredItems = selectedItems.filter((item) => !isSeparateType(item) && getCardColors(item).length === 0).sort(sortBySetAndCode);
-  if (uncoloredItems.length > 0) itemsByColor.push({ color: "Other", items: uncoloredItems });
-  const specialTypeGroups = separateTypes.map((type) => ({
-    color: type === "legend" ? "Legend" : "Battlefield",
-    items: selectedItems.filter((item) => (item.card?.type || "").toLowerCase() === type).sort(sortBySetAndCode),
-  })).filter((group) => group.items.length > 0);
-  const imageGroups = [...itemsByColor, ...specialTypeGroups];
+  const imageGroups: ImageGroup[] = [...colorGroups, ...buildColorGroups(uncoloredItems, "Other", "other"), ...specialTypeGroups];
 
   const toggleItem = (id: string) => {
     setSelectedIds((current) =>
       current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id],
     );
+  };
+
+  const selectAllFiltered = () => {
+    setSelectedIds((current) => [...new Set([...current, ...filteredItems.map((item) => item.id)])]);
   };
 
   const downloadImagesByColor = async () => {
@@ -181,7 +335,7 @@ export default function ShopGemImagePage() {
         const rows = Math.ceil(group.items.length / COLUMNS);
         const canvas = document.createElement("canvas");
         canvas.width = CANVAS_WIDTH;
-        canvas.height = PADDING * 2 + 82 + rows * CARD_HEIGHT + (rows - 1) * GAP;
+        canvas.height = PADDING * 2 + HEADER_HEIGHT + rows * CARD_HEIGHT + (rows - 1) * GAP;
 
         const context = canvas.getContext("2d");
         if (!context) throw new Error("เบราว์เซอร์ไม่รองรับการสร้างรูปภาพ");
@@ -189,12 +343,12 @@ export default function ShopGemImagePage() {
         context.fillStyle = "#10131b";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "#f59e0b";
-        context.font = "bold 34px sans-serif";
+        context.font = "bold 48px sans-serif";
         context.textAlign = "left";
-        context.fillText(`ZBERUS SHOP - ${group.color.toUpperCase()}`, PADDING, PADDING + 34);
+        context.fillText(`ZBERUS SHOP - ${group.title}`, PADDING, PADDING + 46);
         context.fillStyle = "#a1a1aa";
-        context.font = "18px sans-serif";
-        context.fillText(`${group.items.length} cards | 8 columns | sorted by set and code`, PADDING, PADDING + 64);
+        context.font = "24px sans-serif";
+        context.fillText(`${group.items.length} cards | ${group.note}`, PADDING, PADDING + 84);
 
         await Promise.all(group.items.map(async (item, index) => {
           const image = new Image();
@@ -208,7 +362,7 @@ export default function ShopGemImagePage() {
           const column = index % COLUMNS;
           const row = Math.floor(index / COLUMNS);
           const x = PADDING + column * (tileWidth + GAP);
-          const y = PADDING + 88 + row * (CARD_HEIGHT + GAP);
+          const y = PADDING + HEADER_HEIGHT + row * (CARD_HEIGHT + GAP);
 
           context.fillStyle = "#1c2230";
           context.beginPath();
@@ -216,37 +370,59 @@ export default function ShopGemImagePage() {
           context.fill();
 
           const imageMaxWidth = tileWidth - 20;
-          const imageMaxHeight = 230;
+          const imageMaxHeight = 360;
           const scale = Math.min(imageMaxWidth / image.naturalWidth, imageMaxHeight / image.naturalHeight);
           const imageWidth = image.naturalWidth * scale;
           const imageHeight = image.naturalHeight * scale;
-          context.drawImage(image, x + (tileWidth - imageWidth) / 2, y + 10, imageWidth, imageHeight);
+          const imageX = x + (tileWidth - imageWidth) / 2;
+          const imageY = y + 12;
+          context.drawImage(image, imageX, imageY, imageWidth, imageHeight);
+
+          const print = (item.print || "").trim();
+          if (print && print.toLowerCase() !== "normal") {
+            const label = print.toUpperCase();
+            context.font = "bold 18px sans-serif";
+            const badgePaddingX = 12;
+            const badgeHeight = 32;
+            const badgeWidth = Math.max(48, context.measureText(label).width + badgePaddingX * 2);
+            const badgeX = imageX + 10;
+            const badgeY = imageY + imageHeight - badgeHeight - 10;
+            context.fillStyle = print.toLowerCase() === "foil" ? "#fbbf24" : "#c084fc";
+            context.beginPath();
+            context.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 6);
+            context.fill();
+            context.fillStyle = "#10131b";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText(label, badgeX + badgeWidth / 2, badgeY + badgeHeight / 2 + 1);
+            context.textBaseline = "alphabetic";
+          }
 
           context.fillStyle = "#ffffff";
-          context.font = "bold 13px sans-serif";
+          context.font = "bold 18px sans-serif";
           context.textAlign = "left";
-          context.fillText((item.card?.name || "Unknown Card").slice(0, 22), x + 10, y + 270, tileWidth - 20);
+          context.fillText((item.card?.name || "Unknown Card").slice(0, 22), x + 12, y + 400, tileWidth - 24);
           context.fillStyle = "#a1a1aa";
-          context.font = "12px sans-serif";
-          context.fillText(item.card?.code || item.print || "", x + 10, y + 294, tileWidth - 20);
+          context.font = "15px sans-serif";
+          context.fillText(item.card?.code || item.print || "", x + 12, y + 428, tileWidth - 24);
           context.fillStyle = "#4ade80";
-          context.font = "12px sans-serif";
-          context.fillText(`คงเหลือ ${item.quantity ?? 0} ใบ`, x + 10, y + 320, tileWidth - 20);
+          context.font = "15px sans-serif";
+          context.fillText(`คงเหลือ ${item.quantity ?? 0} ใบ`, x + 12, y + 458, tileWidth - 24);
           context.fillStyle = "#fbbf24";
-          context.font = "bold 15px sans-serif";
+          context.font = "bold 18px sans-serif";
           context.textAlign = "right";
-          context.fillText(`฿${item.price}`, x + tileWidth - 10, y + 320, tileWidth - 20);
+          context.fillText(`฿${item.price}`, x + tileWidth - 12, y + 458, tileWidth - 24);
           context.textAlign = "left";
         }));
 
         const blob = await new Promise<Blob>((resolve, reject) => {
           canvas.toBlob((result) => {
             if (result) resolve(result);
-            else reject(new Error(`สร้างไฟล์ ${group.color} PNG ไม่สำเร็จ`));
+            else reject(new Error(`สร้างไฟล์ ${group.title} PNG ไม่สำเร็จ`));
           }, "image/png");
         });
         files.push({
-          name: `shop-gem-image-${group.color.toLowerCase()}.png`,
+          name: `shop-gem-image-${group.fileKey}.png`,
           data: new Uint8Array(await blob.arrayBuffer()),
         });
       }
@@ -270,10 +446,10 @@ export default function ShopGemImagePage() {
       <section className="rounded-xl border border-[#333] bg-[#111] p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-300">
-            <span>เลือกแล้ว {selectedItems.length} / {items.length} ใบ</span>
+            <span>เลือกแล้ว {selectedItems.length} / {items.length} ใบ · แสดง {filteredItems.length} รายการ</span>
             <button
               type="button"
-              onClick={() => setSelectedIds(items.map((item) => item.id))}
+              onClick={selectAllFiltered}
               className="text-amber-400 hover:text-amber-300"
             >
               เลือกทั้งหมด
@@ -285,7 +461,6 @@ export default function ShopGemImagePage() {
             >
               ล้างการเลือก
             </button>
-            <span>สร้าง PNG {imageGroups.length} ภาพ · กว้าง 1920 px · 8 คอลัมน์ · เรียงตาม Set และ Code</span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
@@ -309,6 +484,59 @@ export default function ShopGemImagePage() {
         </div>
       </section>
 
+      <section className="rounded-xl border border-[#333] bg-[#1a1a1a] p-4 sm:p-6">
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by card name, code, or print..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#111] border border-[#333] rounded-md pl-4 pr-10 py-2 text-sm outline-none focus:border-[var(--primary)] text-white"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex gap-2">
+            {COLORS.map((rune) => (
+              <button
+                key={rune}
+                type="button"
+                onClick={() =>
+                  setSelectedColor((prev) => (prev.includes(rune) ? prev.filter((r) => r !== rune) : [...prev, rune]))
+                }
+                className={`w-9 h-9 rounded-full border flex items-center justify-center hover:opacity-80 transition-all ${selectedColor.includes(rune) ? "border-[var(--primary)] bg-[#222]" : "border-[#444] bg-transparent"}`}
+                title={rune}
+                aria-label={`กรองตาม ${rune}`}
+              >
+                <img src={`/runes/${rune}.webp`} alt={rune} className="w-6 h-6 object-contain" onError={(e) => (e.target as HTMLImageElement).style.display = "none"} />
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-4 flex-1">
+            <MultiSelect label="Set" options={SET_OPTIONS} selected={selectedSet} onChange={setSelectedSet} />
+            <MultiSelect label="Type" options={TYPE_OPTIONS} selected={selectedType} onChange={setSelectedType} />
+            <MultiSelect label="Rarity" options={RARITY_OPTIONS} selected={selectedRarity} onChange={setSelectedRarity} />
+
+            <div className="relative flex-1 min-w-[120px]">
+              <div className="flex items-center gap-2 bg-[#111] border border-[#333] rounded-md px-3 py-1.5 cursor-pointer h-full">
+                <span className="text-xs text-gray-500 whitespace-nowrap">Price</span>
+                <select
+                  value={selectedPriceSort}
+                  onChange={(e) => setSelectedPriceSort(e.target.value)}
+                  className="bg-transparent text-sm text-gray-300 w-full outline-none appearance-none cursor-pointer"
+                >
+                  <option value="None" className="bg-[#1a1a1a]">None</option>
+                  <option value="HighToLow" className="bg-[#1a1a1a]">มากไปน้อย</option>
+                  <option value="LowToHigh" className="bg-[#1a1a1a]">น้อยไปมาก</option>
+                </select>
+                <svg className="w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {error && <div role="alert" className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-400">{error}</div>}
       {downloadUrl && <p role="status" className="text-sm text-green-400">สร้างภาพครบแล้ว คลิกปุ่ม “ดาวน์โหลด ZIP” เพื่อบันทึกไฟล์</p>}
 
@@ -318,9 +546,13 @@ export default function ShopGemImagePage() {
         <div className="rounded-xl border border-[#333] bg-[#111] p-8 text-center text-gray-400">
           ไม่พบรูปการ์ดในรายการ Shop Management
         </div>
+      ) : sortedFilteredItems.length === 0 ? (
+        <div className="rounded-xl border border-[#333] bg-[#111] p-8 text-center text-gray-400">
+          ไม่พบสินค้าที่ค้นหา
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((item) => (
+          {sortedFilteredItems.map((item) => (
             <label
               key={item.id}
               className={`cursor-pointer overflow-hidden rounded-xl border bg-[#111] transition-colors ${selectedIds.includes(item.id) ? "border-amber-500" : "border-[#333] opacity-60"}`}

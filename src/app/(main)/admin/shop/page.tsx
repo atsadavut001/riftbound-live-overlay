@@ -3,8 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { SET_OPTIONS } from "@/lib/sets";
 import { RARITY_OPTIONS } from "@/lib/rarity";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import ShopItemForm from "@/components/admin/ShopItemForm";
 
 const MultiSelect = ({ label, options, selected, onChange }: { label: string, options: {label: string, value: string}[], selected: string[], onChange: (v: string[]) => void }) => {
   const [open, setOpen] = useState(false);
@@ -69,8 +68,9 @@ export default function AdminShopPage() {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-
-  const router = useRouter();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [creatingCardId, setCreatingCardId] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   useEffect(() => {
     fetchItems();
@@ -164,12 +164,15 @@ export default function AdminShopPage() {
           <h1 className="text-3xl font-bold mb-2 text-[var(--primary)]">Shop Management</h1>
           <p className="text-gray-400">Manage Zberus Shop inventory and prices</p>
         </div>
-        <Link 
-          href="/admin/shop/new" 
-          className="bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg"
-        >
-          + Add Shop Item
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => { setCreatingCardId(null); setCreateOpen(true); }}
+            className="rounded-lg bg-[var(--primary)] px-4 py-2 font-medium text-white shadow-lg transition-colors hover:bg-[var(--primary-hover)]"
+          >
+            + Add Shop Item
+          </button>
+        </div>
       </div>
 
       <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-4 sm:p-6 mb-6">
@@ -293,7 +296,7 @@ export default function AdminShopPage() {
                     <span className="font-bold text-[var(--primary)]">฿{item.price}</span>
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => router.push(`/admin/shop/${item.id}`)}
+                        onClick={() => setEditingId(item.id)}
                         className="rounded p-2 text-blue-400 transition-colors hover:bg-blue-400/10"
                         title="Edit"
                         aria-label={`Edit ${item.card?.name || "shop item"}`}
@@ -353,6 +356,42 @@ export default function AdminShopPage() {
           </div>
         )}
       </div>
+
+      {createOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/80 p-4" role="dialog" aria-modal="true" aria-label="Add shop item">
+          <div className="mx-auto my-4 max-w-2xl">
+            <ShopItemForm
+              key={`new-${creatingCardId ?? "blank"}`}
+              initialCardId={creatingCardId ?? undefined}
+              onSaved={() => {
+                setCreateOpen(false);
+                setCreatingCardId(null);
+                fetchItems();
+              }}
+              onCancel={() => {
+                setCreateOpen(false);
+                setCreatingCardId(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {editingId && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/80 p-4" role="dialog" aria-modal="true" aria-label="Edit shop item">
+          <div className="mx-auto my-4 max-w-2xl">
+            <ShopItemForm
+              key={editingId}
+              shopItemId={editingId}
+              onSaved={() => {
+                setEditingId(null);
+                fetchItems();
+              }}
+              onCancel={() => setEditingId(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
