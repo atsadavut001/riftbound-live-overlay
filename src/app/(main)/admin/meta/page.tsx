@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface SyncResult {
   total?: number;
@@ -10,11 +10,40 @@ interface SyncResult {
   errors?: string[];
 }
 
+interface SyncLog {
+  id: string;
+  status: string;
+  trigger: string;
+  format: string;
+  last: number;
+  total: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+  durationMs: number;
+  createdAt: string;
+}
+
 export default function AdminMetaSyncPage() {
   const [last, setLast] = useState(30);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SyncResult | null>(null);
   const [error, setError] = useState("");
+  const [logs, setLogs] = useState<SyncLog[]>([]);
+
+  const loadLogs = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/meta/sync/logs");
+      if (res.ok) setLogs(await res.json());
+    } catch {
+      // ignore: the log list is informational
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLogs();
+  }, [loadLogs]);
 
   const runSync = async () => {
     setLoading(true);
@@ -33,6 +62,7 @@ export default function AdminMetaSyncPage() {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
+      loadLogs();
     }
   };
 
@@ -102,6 +132,55 @@ export default function AdminMetaSyncPage() {
           )}
         </div>
       )}
+
+      <div className="bg-[#111] border border-[var(--border)] rounded-lg p-6 mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold">ประวัติการซิงก์</h2>
+          <button onClick={loadLogs} className="text-xs text-gray-400 hover:text-white">
+            รีเฟรช
+          </button>
+        </div>
+        {logs.length === 0 ? (
+          <p className="text-sm text-gray-500">ยังไม่มีประวัติการซิงก์</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="text-left text-gray-400 border-b border-[#333]">
+                <tr>
+                  <th className="py-2 pr-3">เวลา</th>
+                  <th className="py-2 pr-3">สถานะ</th>
+                  <th className="py-2 pr-3">ที่มา</th>
+                  <th className="py-2 pr-3">ย้อนหลัง</th>
+                  <th className="py-2 pr-3">พบ</th>
+                  <th className="py-2 pr-3">ใหม่</th>
+                  <th className="py-2 pr-3">อัปเดต</th>
+                  <th className="py-2 pr-3">ข้าม</th>
+                  <th className="py-2 pr-3">ใช้เวลา</th>
+                  <th className="py-2">ข้อผิดพลาด</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log) => (
+                  <tr key={log.id} className="border-b border-[#222] align-top">
+                    <td className="py-2 pr-3 whitespace-nowrap">{new Date(log.createdAt).toLocaleString("th-TH")}</td>
+                    <td className={`py-2 pr-3 ${log.status === "success" ? "text-green-400" : "text-red-400"}`}>
+                      {log.status === "success" ? "สำเร็จ" : "ล้มเหลว"}
+                    </td>
+                    <td className="py-2 pr-3">{log.trigger === "cron" ? "อัตโนมัติ" : "กดเอง"}</td>
+                    <td className="py-2 pr-3">{log.last} วัน</td>
+                    <td className="py-2 pr-3">{log.total}</td>
+                    <td className="py-2 pr-3">{log.created}</td>
+                    <td className="py-2 pr-3">{log.updated}</td>
+                    <td className="py-2 pr-3">{log.skipped}</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{(log.durationMs / 1000).toFixed(1)} วิ</td>
+                    <td className="py-2 text-red-400">{log.errors?.length ? log.errors.join(" | ") : "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

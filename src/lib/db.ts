@@ -13,13 +13,14 @@ import { OrderItem } from "./entities/OrderItem";
 import { Address } from "./entities/Address";
 import { Tournament } from "./entities/Tournament";
 import { TournamentStanding } from "./entities/TournamentStanding";
+import { MetaSyncLog } from "./entities/MetaSyncLog";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
   synchronize: false, // ⚠️ MUST BE FALSE IN PRODUCTION DUE TO MINIFICATION
   logging: false,
-  entities: [User, OverlayState, Card, CardTypeTemplate, Issue, Deck, ShopItem, Order, OrderItem, Address, Tournament, TournamentStanding],
+  entities: [User, OverlayState, Card, CardTypeTemplate, Issue, Deck, ShopItem, Order, OrderItem, Address, Tournament, TournamentStanding, MetaSyncLog],
   subscribers: [],
   migrations: [],
 });
@@ -90,6 +91,28 @@ export const getDataSource = async () => {
       await AppDataSource.query(`CREATE INDEX IF NOT EXISTS "IDX_tournament_standings_tournament_leader" ON "tournament_standings" ("tournamentId", "leaderName")`);
     } catch (e) {
       console.warn("Auto-migrate meta tables failed:", e);
+    }
+
+    // Meta sync run log (shown on the admin Meta Sync page)
+    try {
+      await AppDataSource.query(`
+        CREATE TABLE IF NOT EXISTS "meta_sync_logs" (
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          "status" varchar NOT NULL,
+          "trigger" varchar NOT NULL,
+          "format" varchar NOT NULL DEFAULT 'Constructed',
+          "last" int NOT NULL DEFAULT 30,
+          "total" int NOT NULL DEFAULT 0,
+          "created" int NOT NULL DEFAULT 0,
+          "updated" int NOT NULL DEFAULT 0,
+          "skipped" int NOT NULL DEFAULT 0,
+          "errors" jsonb NOT NULL DEFAULT '[]'::jsonb,
+          "durationMs" int NOT NULL DEFAULT 0,
+          "createdAt" timestamp NOT NULL DEFAULT now()
+        )
+      `);
+    } catch (e) {
+      console.warn("Auto-migrate meta_sync_logs table failed:", e);
     }
   }
   return AppDataSource;

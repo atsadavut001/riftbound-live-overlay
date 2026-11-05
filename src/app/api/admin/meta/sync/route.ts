@@ -3,6 +3,7 @@ import { getDataSource } from "@/lib/db";
 import { Tournament } from "@/lib/entities/Tournament";
 import { TournamentStanding } from "@/lib/entities/TournamentStanding";
 import { Card } from "@/lib/entities/Card";
+import { MetaSyncLog } from "@/lib/entities/MetaSyncLog";
 import { requireAdmin } from "@/lib/auth";
 import { fetchTopDeckTournaments, normalizeLeader, parseDecklist, flattenDeckObj, leaderFromDeckObj } from "@/lib/topdeck";
 
@@ -29,10 +30,15 @@ export async function POST(req: NextRequest) {
 async function runSync(req: NextRequest) {
   if (!(await isAuthorized(req))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const startedAt = Date.now();
+  const trigger = req.headers.get("authorization")?.startsWith("Bearer ") ? "cron" : "manual";
+  let last = 30;
+  let format = "Constructed";
+
   try {
     const body = await req.json().catch(() => ({}));
-    const last = typeof body.last === "number" ? body.last : 30;
-    const format = typeof body.format === "string" ? body.format : "Constructed";
+    last = typeof body.last === "number" ? body.last : 30;
+    format = typeof body.format === "string" ? body.format : "Constructed";
 
     const tournaments = await fetchTopDeckTournaments({ last, format });
 
@@ -182,6 +188,19 @@ async function runSync(req: NextRequest) {
       }
     }
 
+    await logSync({
+      status: "success",
+      trigger,
+      format,
+      last,
+      total: tournaments.length,
+      created,
+      updated,
+      skipped,
+      errors,
+      durationMs: Date.now() - startedAt,
+    });
+
     return NextResponse.json({
       ok: true,
       total: tournaments.length,
@@ -192,6 +211,29 @@ async function runSync(req: NextRequest) {
     });
   } catch (error) {
     console.error("TopDeck sync failed:", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal Server Error" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    await logSync({
+      status: "failed",
+      trigger,
+      format,
+      last,
+      total: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+      errors: [message],
+      durationMs: Date.now() - startedAt,
+    });
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+/** Best-effort: a logging failure must not change the sync result. */
+async function logSync(entry: Omit<MetaSyncLog, "id" | "createdAt">) {
+  try {
+    const db = await getDataSource();
+    await db.getRepository(MetaSyncLog).save(db.getRepository(MetaSyncLog).create(entry));
+  } catch (e) {
+    console.warn("Failed to write meta sync log:", e);
   }
 }
