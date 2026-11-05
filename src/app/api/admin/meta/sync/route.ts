@@ -7,13 +7,27 @@ import { requireAdmin } from "@/lib/auth";
 import { fetchTopDeckTournaments, normalizeLeader, parseDecklist, flattenDeckObj, leaderFromDeckObj } from "@/lib/topdeck";
 
 /**
- * POST /api/admin/meta/sync
+ * POST /api/admin/meta/sync (admin session)
+ * GET /api/admin/meta/sync (Vercel Cron, Authorization: Bearer CRON_SECRET)
  * Body: { last?: number (days back, default 30), format?: string (default "Constructed") }
  * Fetches completed Riftbound tournaments from TopDeck.gg and upserts them locally.
  */
+async function isAuthorized(req: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && req.headers.get("authorization") === `Bearer ${cronSecret}`) return true;
+  return (await requireAdmin()) !== null;
+}
+
+export async function GET(req: NextRequest) {
+  return runSync(req);
+}
+
 export async function POST(req: NextRequest) {
-  const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  return runSync(req);
+}
+
+async function runSync(req: NextRequest) {
+  if (!(await isAuthorized(req))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const body = await req.json().catch(() => ({}));
